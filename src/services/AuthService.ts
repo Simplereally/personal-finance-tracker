@@ -7,20 +7,10 @@ export function createAuthService(authRepository: IAuthRepository) {
       return await authRepository.signUp({ email, password });
     },
     async signIn({ email, password }: AuthSignInParams): Promise<AuthSignInResult> {
-      const result = await authRepository.signIn({ email, password });
-      console.log("AuthService signIn result:", result);
-      if (result.success) {
-        return { ...result, redirectTo: "/" };
-      }
-      return result;
+      return await authRepository.signIn({ email, password });      
     },
     async signOut(): Promise<AuthSignOutResult> {
-      const result = await authRepository.signOut();
-      console.log("AuthService signOut result:", result);
-      if (result.success) {
-        return { ...result, redirectTo: "/login" };
-      }
-      return result;
+      return await authRepository.signOut();
     },
     async getUser(): Promise<AuthGetUserResult> {
       return await authRepository.getUser();

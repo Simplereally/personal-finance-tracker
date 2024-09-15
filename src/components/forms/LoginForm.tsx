@@ -16,6 +16,7 @@ import { type AuthSignInParams } from "@/types/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -23,6 +24,7 @@ import { type z } from "zod";
 
 const LoginForm = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof loginFormSchema>>({
     resolver: zodResolver(loginFormSchema),
@@ -39,15 +41,11 @@ const LoginForm = () => {
       email: data.email,
       password: data.password,
     };
-    try {
-      const result = await signIn(signInParams);
-      console.log("signIn result", result);
-    } catch (error) {
-      console.error("Error signing in:", error);
-      toast.error("Login failed. Please try again.");
-    } finally {
-      setIsLoading(false);
+    const result = await signIn(signInParams);
+    if (!result.success) {
+      toast.error(result.error ?? "Login failed. Please try again.");
     }
+    setIsLoading(false);
   };
 
   return (

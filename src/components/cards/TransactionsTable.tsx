@@ -22,7 +22,7 @@ export default function TransactionsTable() {
       setTransactions(transactions);
     };
 
-    fetchTransactions();
+    void fetchTransactions();
   }, []);
 
   return (

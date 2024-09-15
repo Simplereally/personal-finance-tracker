@@ -11,11 +11,10 @@ export default function LogoutButton() {
   const handleLogout = async () => {
     setIsLoading(true);
     const response = await signOut();
-    console.log("response", response);
     if (!response.success) {
       toast.error(response.error ?? "Logout failed. Please try again.");
-      setIsLoading(false);
     }
+    setIsLoading(false);
   };
 
   return (
