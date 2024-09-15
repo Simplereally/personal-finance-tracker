@@ -13,7 +13,8 @@ export function createAuthService(authRepository: IAuthRepository) {
       return await authRepository.signOut();
     },
     async getUser(): Promise<AuthGetUserResult> {
-      return await authRepository.getUser();
+      const result = await authRepository.getUser();
+      return result;
     }
   };
 }

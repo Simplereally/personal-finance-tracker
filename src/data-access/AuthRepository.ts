@@ -26,7 +26,7 @@ export function createAuthRepository(): IAuthRepository {
     async getUser(): Promise<AuthGetUserResult> {
       const { data, error } = await adapter.getUser();
       if (error) return { success: false, error: error.message };
-      return { success: true, userid: data.user.id };
+      return { success: true, userid: data.user?.id };
     }
   };
 }

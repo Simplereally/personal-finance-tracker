@@ -20,5 +20,6 @@ export const signOut = async (): Promise<AuthSignOutResult> => {
 };
 
 export const getUser = async (): Promise<AuthGetUserResult> => {
-  return await authService.getUser();
+  const result = await authService.getUser();
+  return result;
 };

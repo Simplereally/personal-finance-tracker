@@ -2,19 +2,26 @@ import { type AuthSignInParams, type AuthSignUpParams } from "@/types/auth";
 import { createClient } from "@/utils/supabase/server";
 
 export function createSupabaseAuthAdapter() {
-  const supabase = createClient();
   return {
     async signUp({ email, password }: AuthSignUpParams) {
-      return await supabase.auth.signUp({ email, password });
+      const supabase = createClient();
+      const result = await supabase.auth.signUp({ email, password });
+      return result;
     },
-    async getUser()  {
-      return await supabase.auth.getUser();
+    async getUser() {
+      const supabase = createClient();
+      const result = await supabase.auth.getUser();
+      return result;
     },
     async signIn({ email, password }: AuthSignInParams) {
-      return await supabase.auth.signInWithPassword({ email, password });
+      const supabase = createClient();
+      const result = await supabase.auth.signInWithPassword({ email, password });
+      return result;
     },
     async signOut() {
-      return await supabase.auth.signOut();
+      const supabase = createClient();
+      const result = await supabase.auth.signOut();
+      return result;
     },    
   };
 }
