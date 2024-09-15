@@ -1,35 +1,50 @@
-import { createServerClient, type CookieOptions } from '@supabase/ssr';
+import { env } from '@/env';
+import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
 export async function updateSession(request: NextRequest) {
   console.log("[Middleware] Updating session");
-  const supabaseResponse = NextResponse.next({
-    request,
-  })
+  let response = NextResponse.next({
+    request: {
+      headers: request.headers,
+    },
+  });
 
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    env.NEXT_PUBLIC_SUPABASE_URL,
+    env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     {
       cookies: {
-        get(name: string) {
-          return request.cookies.get(name)?.value
+        getAll() {
+          return request.cookies.getAll().map((cookie) => ({
+            name: cookie.name,
+            value: cookie.value,
+          }));
         },
-        set(name: string, value: string, options: CookieOptions) {
-          supabaseResponse.cookies.set({ name, value, ...options })
-        },
-        remove(name: string, options: CookieOptions) {
-          supabaseResponse.cookies.set({ name, value: '', ...options })
+        setAll(cookies) {
+          cookies.forEach((cookie) => {
+            request.cookies.set(cookie.name, cookie.value);
+            response.cookies.set({
+              name: cookie.name,
+              value: cookie.value,
+              ...cookie.options,
+            });
+          });
+          response = NextResponse.next({
+            request: {
+              headers: request.headers,
+            },
+          });
         },
       },
     }
-  )
+  );
 
   const {
     data: { session },
-  } = await supabase.auth.getSession()
+  } = await supabase.auth.getSession();
 
   console.log("[Middleware] Session:", session ? "Found" : "Not found");
 
-  return { response: supabaseResponse, session }
+  return { response, session };
 }
