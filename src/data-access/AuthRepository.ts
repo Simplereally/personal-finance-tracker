@@ -14,14 +14,12 @@ export function createAuthRepository(): IAuthRepository {
     },
     async signIn({ email, password }: AuthSignInParams): Promise<AuthSignInResult> {
       const { data, error } = await adapter.signIn({ email, password });
-      console.log("Supabase signIn result:", { data, error });
       if (error) return { success: false, error: error.message };
       if (!data.session) return { success: false, error: "No session found after sign in" }; 
       return { success: true };
     },
     async signOut(): Promise<AuthSignOutResult> {
       const { error } = await adapter.signOut();
-      console.log("signing out", error);
       if (error) return { success: false, error: error.message };
       return { success: true };
     },

@@ -42,7 +42,11 @@ const LoginForm = () => {
       password: data.password,
     };
     const result = await signIn(signInParams);
-    if (!result.success) {
+    if (result.success) {
+      console.log("Login successful");
+      router.push("/");
+      console.log("Pushed");
+    } else {
       toast.error(result.error ?? "Login failed. Please try again.");
     }
     setIsLoading(false);
