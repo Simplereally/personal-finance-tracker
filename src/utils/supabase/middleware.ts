@@ -29,15 +29,7 @@ export async function updateSession(request: NextRequest) {
     data: { session },
   } = await supabase.auth.getSession()
 
-  if (request.nextUrl.pathname === '/login' || request.nextUrl.pathname.startsWith('/auth')) {
-    return supabaseResponse
-  }
+  console.log("[Middleware] Session:", session ? "Found" : "Not found");
 
-  if (!session) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/login'
-    return NextResponse.redirect(url)
-  }
-
-  return supabaseResponse
+  return { response: supabaseResponse, session }
 }
