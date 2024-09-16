@@ -6,15 +6,20 @@ import { type PostgrestResponse, type PostgrestSingleResponse } from "@supabase/
 export function createSupabaseTransactionAdapter() {
   const supabase = createClient();
   return {
-    async addTransaction(userId: string, transaction: AddTransactionParams): Promise<PostgrestSingleResponse<TransactionData>> {
-      return await supabase.from('transactions').insert({ ...transaction, user_id: userId }).select().single();
+    async addTransaction(transaction: AddTransactionParams): Promise<PostgrestSingleResponse<TransactionData>> {
+      console.log(transaction)
+      return await supabase
+        .from('transactions')
+        .insert(transaction)
+        .select()
+        .single();
     },
-    async getTransactions(userId: string): Promise<PostgrestResponse<TransactionData>> {
+    async getTransactions(userId: string): Promise<PostgrestResponse<TransactionData & { categories: { id: string; name: string } | null }>> {
       return await supabase
         .from('transactions')
         .select(`
           *,
-          categories:category_id (id, name)
+          categories (id, name)
         `)
         .eq('user_id', userId)
         .order('date', { ascending: false });

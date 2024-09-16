@@ -9,15 +9,10 @@ export type Json =
 export interface Database {
   public: {
     Tables: {
-      users: {
-        Row: { id: string; email: string; created_at: string; updated_at: string }
-        Insert: { id?: string; email: string; created_at?: string; updated_at?: string }
-        Update: { id?: string; email?: string; created_at?: string; updated_at?: string }
-      }
       categories: {
-        Row: { id: string; name: string; user_id: string | null; created_at: string; updated_at: string }
-        Insert: { id?: string; name: string; user_id?: string | null; created_at?: string; updated_at?: string }
-        Update: { id?: string; name?: string; user_id?: string | null; created_at?: string; updated_at?: string }
+        Row: { id: string; name: string; user_id: string; created_at: string; updated_at: string }
+        Insert: { id?: string; name: string; user_id: string; created_at?: string; updated_at?: string }
+        Update: { id?: string; name?: string; user_id?: string; created_at?: string; updated_at?: string }
       }
       transactions: {
         Row: { id: string; user_id: string; category_id: string | null; amount: number; description: string | null; date: string; created_at: string; updated_at: string }
@@ -40,6 +35,5 @@ export interface Database {
   }
 }
 
-export type UserData = Database['public']['Tables']['users']['Row']
 export type TransactionData = Database['public']['Tables']['transactions']['Row']
 export type CategoryData = Database['public']['Tables']['categories']['Row']

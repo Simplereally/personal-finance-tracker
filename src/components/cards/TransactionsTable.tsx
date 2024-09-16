@@ -4,26 +4,35 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
   TableBody,
-  TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
 import { getTransactions } from "@/server/actions/transaction.actions";
-import { type TransactionData } from "@/types/supabase";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import TransactionRow from "./TransactionRow";
 
 export default function TransactionsTable() {
-  const [transactions, setTransactions] = useState<TransactionData[]>([]);
+  const [transactions, setTransactions] = useState([]);
+  const [newTransactionIds, setNewTransactionIds] = useState(new Set());
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     const fetchTransactions = async () => {
-      const { transactions } = await getTransactions();
-      setTransactions(transactions);
+      const result = await getTransactions();
+      if (result.success) {
+        setTransactions(result.transactions);
+      }
     };
 
-    void fetchTransactions();
-  }, []);
+    fetchTransactions();
+
+    const newId = searchParams.get("newTransactionId");
+    if (newId) {
+      setNewTransactionIds((prev) => new Set(prev).add(newId));
+    }
+  }, [searchParams]);
 
   return (
     <Card className="col-span-full">
@@ -42,18 +51,11 @@ export default function TransactionsTable() {
           </TableHeader>
           <TableBody>
             {transactions.map((transaction) => (
-              <TableRow key={transaction.id}>
-                <TableCell>{transaction.date}</TableCell>
-                <TableCell>{transaction.category_id}</TableCell>
-                <TableCell
-                  className={
-                    transaction.amount < 0 ? "text-red-600" : "text-green-600"
-                  }
-                >
-                  ${Math.abs(transaction.amount).toFixed(2)}
-                </TableCell>
-                <TableCell>{transaction.description}</TableCell>
-              </TableRow>
+              <TransactionRow
+                key={transaction.id}
+                transaction={transaction}
+                isNew={newTransactionIds.has(transaction.id)}
+              />
             ))}
           </TableBody>
         </Table>

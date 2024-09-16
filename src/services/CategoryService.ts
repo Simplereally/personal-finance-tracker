@@ -6,6 +6,9 @@ export function createCategoryService(categoryRepository: ICategoryRepository) {
     async getCategories(userId: string): Promise<GetCategoriesResult> {
       return await categoryRepository.getCategories(userId);
     },
+    async createCategory(userId: string, name: string): Promise<GetCategoriesResult> {
+      return await categoryRepository.createCategory(userId, name);
+    },
   };
 }
 

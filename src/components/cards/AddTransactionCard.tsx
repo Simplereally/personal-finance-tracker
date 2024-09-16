@@ -9,71 +9,89 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { getCategories } from "@/server/actions/category.actions";
 import { addTransaction } from "@/server/actions/transaction.actions";
-import { type TransactionData } from "@/types/supabase";
+import { type CategoryData, type TransactionData } from "@/types/supabase";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import Creatable from "react-select/creatable";
 import { toast } from "sonner";
 
 interface Category {
-  id: string;
-  name: string;
+  value: string;
+  label: string;
 }
 
 export default function AddTransactionCard() {
   const [date, setDate] = useState<Date>(new Date());
   const [amount, setAmount] = useState("");
-  const [category, setCategory] = useState("");
+  const [category, setCategory] = useState<Category | null>(null);
   const [description, setDescription] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
 
-  const router = useRouter();
-
   useEffect(() => {
     const fetchCategories = async () => {
       const { categories, error } = await getCategories();
-      console.log("Fetched categories in component:", categories);
       if (error) {
         console.error("Error fetching categories:", error);
         toast.error(error);
       } else {
-        setCategories(categories);
+        setCategories(
+          categories.map((cat: CategoryData) => ({
+            value: cat.id,
+            label: cat.name,
+          })),
+        );
       }
     };
     void fetchCategories();
   }, []);
 
+  const router = useRouter();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    const transactionData: Omit<TransactionData, "user_id" | "id"> = {
+    const transactionData: Omit<
+      TransactionData,
+      "user_id" | "id" | "created_at" | "updated_at"
+    > = {
       amount: parseFloat(amount),
-      category_id: category || null,
-      date: date.toISOString().split("T")[0],
+      category_id: null, // We'll set this to null for new categories
+      date: date.toISOString().split("T")[0] ?? "",
       description: description || null,
     };
 
-    const result = await addTransaction(transactionData);
+    let categoryName: string | undefined;
+
+    if (category) {
+      if ("__isNew__" in category) {
+        // This is a new category
+        categoryName = category.label;
+      } else {
+        // This is an existing category
+        transactionData.category_id = category.value;
+      }
+    }
+
+    const result = await addTransaction(transactionData, categoryName);
 
     if (result.success) {
       toast.success("Transaction added successfully");
+      // Reset form fields
       setAmount("");
-      setCategory("");
+      setCategory(null);
       setDescription("");
       setDate(new Date());
-      router.refresh();
+
+      // Refresh the page with the new transaction ID as a query parameter
+      if (result.newTransactionId) {
+        router.push(`?newTransactionId=${result.newTransactionId}`);
+      }
     } else {
       toast.error(result.error ?? "Failed to add transaction");
     }
@@ -95,18 +113,13 @@ export default function AddTransactionCard() {
             onChange={(e) => setAmount(e.target.value)}
             required
           />
-          <Select onValueChange={setCategory} value={category} required>
-            <SelectTrigger>
-              <SelectValue placeholder="Select category" />
-            </SelectTrigger>
-            <SelectContent>
-              {categories.map((cat) => (
-                <SelectItem key={cat.id} value={cat.id}>
-                  {cat.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Creatable
+            isClearable
+            options={categories}
+            value={category}
+            onChange={setCategory}
+            placeholder="Select or create a category..."
+          />
           <Input
             type="text"
             placeholder="Description"

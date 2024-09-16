@@ -19,3 +19,12 @@ export async function getCategories(): Promise<GetCategoriesResult> {
 
   return await categoryService.getCategories(userResult.userid);
 }
+
+export async function createCategory(name: string): Promise<GetCategoriesResult> {
+  const userResult = await authService.getUser();
+  if (!userResult.success || !userResult.userid) {
+    return { success: false, categories: [], error: "User not authenticated" };
+  }
+
+  return await categoryService.createCategory(userResult.userid, name);
+}

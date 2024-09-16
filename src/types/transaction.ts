@@ -1,16 +1,11 @@
 import { type TransactionData } from "@/types/supabase";
 
-export interface AddTransactionParams {
-  amount: number;
-  category_id: string | null;
-  date: string;
-  description: string | null;
-}
+export type AddTransactionParams = Omit<TransactionData, "id" | "created_at" | "updated_at">;
 
 export interface AddTransactionResult {
   success: boolean;
-  error?: string;
   transactionId?: string;
+  error?: string;
 }
 
 export interface GetTransactionsResult {

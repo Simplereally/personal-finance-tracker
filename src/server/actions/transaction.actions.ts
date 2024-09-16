@@ -1,29 +1,32 @@
 "use server";
 
 import { createAuthRepository } from "@/data-access/AuthRepository";
+import { createCategoryRepository } from "@/data-access/CategoryRepository";
 import { createTransactionRepository } from "@/data-access/TransactionRepository";
 import { createAuthService } from "@/services/AuthService";
 import { createTransactionService } from "@/services/TransactionService";
-import { type AddTransactionParams, type AddTransactionResult, type GetTransactionsResult } from "@/types/transaction";
-import { revalidatePath } from "next/cache";
+import { type TransactionData } from "@/types/supabase";
+import { type AddTransactionResult, type GetTransactionsResult } from "@/types/transaction";
+import { revalidateTag } from "next/cache";
 
 const transactionRepository = createTransactionRepository();
-const transactionService = createTransactionService(transactionRepository);
+const categoryRepository = createCategoryRepository();
+const transactionService = createTransactionService(transactionRepository, categoryRepository);
 const authRepository = createAuthRepository();
 const authService = createAuthService(authRepository);
 
-export async function addTransaction(transaction: AddTransactionParams): Promise<AddTransactionResult> {
+export async function addTransaction(
+  transactionData: Omit<TransactionData, "user_id" | "id" | "created_at" | "updated_at">,
+  categoryName?: string
+): Promise<AddTransactionResult & { newTransactionId?: string }> {
   const userResult = await authService.getUser();
   if (!userResult.success || !userResult.userid) {
     return { success: false, error: "User not authenticated" };
   }
-
-  const result = await transactionService.addTransaction(userResult.userid, transaction);
-  
+  const result = await transactionService.addTransaction(userResult.userid, transactionData, categoryName);
   if (result.success) {
-    revalidatePath('/'); // Revalidate the dashboard page
+    revalidateTag('transactions');
   }
-
   return result;
 }
 
@@ -33,5 +36,7 @@ export async function getTransactions(): Promise<GetTransactionsResult> {
     return { success: false, transactions: [], error: "User not authenticated" };
   }
 
-  return await transactionService.getTransactions(userResult.userid);
+  const result = await transactionService.getTransactions(userResult.userid);
+  revalidateTag('transactions'); // This ensures the data is always fresh
+  return result;
 }
