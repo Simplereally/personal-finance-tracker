@@ -34,24 +34,24 @@
 
 @layer base {
   :root {
-    --background: 329 9% 100%;
+    --background: 329 100% 99%;
     --foreground: 329 5% 10%;
     --card: 329 9% 100%;
-    --card-foreground: 329 5% 15%;
+    --card-foreground: 0 0% 37%;
     --popover: 329 9% 100%;
     --popover-foreground: 329 95% 10%;
-    --primary: 329 73% 87%;
+    --primary: 329 100% 79%;
     --primary-foreground: 0 0% 0%;
-    --secondary: 329 10% 90%;
-    --secondary-foreground: 0 0% 0%;
+    --secondary: 329 90% 95%;
+    --secondary-foreground: 0 0% 37%;
     --muted: 291 10% 95%;
     --muted-foreground: 329 5% 40%;
-    --accent: 291 10% 90%;
+    --accent: 316 51% 94%;
     --accent-foreground: 329 5% 15%;
     --destructive: 0 50% 50%;
     --destructive-foreground: 329 5% 100%;
-    --border: 329 20% 82%;
-    --input: 329 20% 50%;
+    --border: 329 100% 95%;
+    --input: 329 100% 88%;
     --ring: 329 73% 87%;
     --radius: 1rem;
     --chart-1: 12 76% 61%;
@@ -280,7 +280,7 @@
   }
 
   .sidebar-logo {
-    @apply text-26 font-bold text-primary;
+    @apply text-26 font-bold text-primary/[1.55];
   }
 
   .sidebar-link-active {
