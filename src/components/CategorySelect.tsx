@@ -18,11 +18,13 @@ export interface Category {
 interface CategorySelectProps {
   value: Category | null;
   onChange: (category: Category | null) => void;
+  isDisabled: boolean;
 }
 
 export function CategorySelect({
   value,
   onChange,
+  isDisabled,
 }: Readonly<CategorySelectProps>) {
   const [categories, setCategories] = useState<Category[]>([]);
 
@@ -71,6 +73,7 @@ export function CategorySelect({
 
   return (
     <Creatable
+      isDisabled={isDisabled}
       isClearable
       options={categories}
       value={value}

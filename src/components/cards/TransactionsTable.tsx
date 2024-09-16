@@ -61,7 +61,7 @@ export default function TransactionsTable({
         <CardContent>
           {isLoading ? (
             <div className="flex h-32 items-center justify-center">
-              <Loader2 className="h-8 w-8 animate-spin" />
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
           ) : (
             <Table>

@@ -33,7 +33,7 @@ export default function OverviewCard({
           <CardTitle className="text-2xl font-bold">Overview</CardTitle>
         </CardHeader>
         <CardContent className="flex h-40 items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin" />
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </CardContent>
       </Card>
     );
