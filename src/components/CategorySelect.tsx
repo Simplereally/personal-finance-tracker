@@ -20,7 +20,10 @@ interface CategorySelectProps {
   onChange: (category: Category | null) => void;
 }
 
-export function CategorySelect({ value, onChange }: CategorySelectProps) {
+export function CategorySelect({
+  value,
+  onChange,
+}: Readonly<CategorySelectProps>) {
   const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {
@@ -45,20 +48,20 @@ export function CategorySelect({ value, onChange }: CategorySelectProps) {
     const result = await createCategory(inputValue);
     if (result.success && result.categories.length > 0) {
       const newCategory = {
-        value: result.categories[0].id,
-        label: result.categories[0].name,
+        value: result.categories[0]?.id ?? "",
+        label: result.categories[0]?.name ?? "",
       };
       setCategories((prev) => [...prev, newCategory]);
       onChange(newCategory);
     } else {
-      toast.error(result.error || "Failed to create category");
+      toast.error(result.error ?? "Failed to create category");
     }
   };
 
   const handleCategoryChange = useCallback(
-    (newCategory: Category | null, actionMeta: any) => {
+    (newCategory: Category | null, actionMeta: { action: string }) => {
       if (actionMeta.action === "create-option") {
-        void handleCreateCategory(newCategory?.label || "");
+        void handleCreateCategory(newCategory?.label ?? "");
       } else {
         onChange(newCategory);
       }
