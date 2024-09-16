@@ -59,9 +59,8 @@ export default function AddTransactionCard({
       toast.success("Transaction added successfully");
       setAmount("");
       setDescription("");
-      // Optionally, you can reset the category and date here if needed
-      // setCategory(null);
-      // setDate(new Date());
+      setCategory(null);
+      setDate(new Date());
     } else {
       toast.error(result.error ?? "Failed to add transaction");
     }

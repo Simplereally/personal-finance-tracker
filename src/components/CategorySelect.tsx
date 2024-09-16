@@ -1,7 +1,10 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { getCategories } from "@/server/actions/category.actions";
+import {
+  createCategory,
+  getCategories,
+} from "@/server/actions/category.actions";
 import { type CategoryData } from "@/types/supabase";
 import { useCallback, useEffect, useState } from "react";
 import Creatable from "react-select/creatable";
@@ -38,9 +41,27 @@ export function CategorySelect({ value, onChange }: CategorySelectProps) {
     void fetchCategories();
   }, []);
 
-  const handleCategoryChange = useCallback(
-    (newCategory: Category | null) => {
+  const handleCreateCategory = async (inputValue: string) => {
+    const result = await createCategory(inputValue);
+    if (result.success && result.categories.length > 0) {
+      const newCategory = {
+        value: result.categories[0].id,
+        label: result.categories[0].name,
+      };
+      setCategories((prev) => [...prev, newCategory]);
       onChange(newCategory);
+    } else {
+      toast.error(result.error || "Failed to create category");
+    }
+  };
+
+  const handleCategoryChange = useCallback(
+    (newCategory: Category | null, actionMeta: any) => {
+      if (actionMeta.action === "create-option") {
+        void handleCreateCategory(newCategory?.label || "");
+      } else {
+        onChange(newCategory);
+      }
     },
     [onChange],
   );
