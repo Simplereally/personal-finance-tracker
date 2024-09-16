@@ -92,7 +92,10 @@ export default function TransactionsTable({
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteConfirm}>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              variant="destructive"
+            >
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>

@@ -83,7 +83,10 @@ export default function AddTransactionCard({
             onChange={(e) => setAmount(e.target.value)}
             required
           />
-          <CategorySelect value={category} onChange={setCategory} />
+          <CategorySelect
+            value={category}
+            onChange={(newValue) => setCategory(newValue)}
+          />
           <Input
             type="text"
             placeholder="Description"

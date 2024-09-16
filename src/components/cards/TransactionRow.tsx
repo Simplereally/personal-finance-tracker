@@ -45,7 +45,9 @@ export default function TransactionRow({
       <TableCell>{formattedDate}</TableCell>
       <TableCell>{transaction.categories?.name ?? "Uncategorized"}</TableCell>
       <TableCell
-        className={transaction.amount < 0 ? "text-red-600" : "text-green-600"}
+        className={
+          transaction.amount < 0 ? "text-money-red" : "text-money-green"
+        }
       >
         ${Math.abs(transaction.amount).toFixed(2)}
       </TableCell>

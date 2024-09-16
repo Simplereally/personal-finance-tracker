@@ -6,7 +6,9 @@ interface OverviewCardProps {
   transactions: TransactionWithFetchedAt[];
 }
 
-export default function OverviewCard({ transactions }: OverviewCardProps) {
+export default function OverviewCard({
+  transactions,
+}: Readonly<OverviewCardProps>) {
   const { income, expense } = transactions.reduce(
     (acc, transaction) => {
       if (transaction.amount > 0) {
@@ -30,14 +32,14 @@ export default function OverviewCard({ transactions }: OverviewCardProps) {
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <p className="text-sm font-medium text-muted-foreground">Income</p>
-            <p className="text-shadow-sm text-2xl font-bold text-green-600">
+            <p className="text-shadow-sm text-money-green text-2xl font-bold">
               +$
               <AnimatedCounter decimal={2} amount={income} />
             </p>
           </div>
           <div className="space-y-2">
             <p className="text-sm font-medium text-muted-foreground">Expense</p>
-            <p className="text-shadow-sm text-2xl font-bold text-red-600">
+            <p className="text-shadow-sm text-money-red text-2xl font-bold">
               -$
               <AnimatedCounter decimal={2} amount={expense} />
             </p>
@@ -48,7 +50,7 @@ export default function OverviewCard({ transactions }: OverviewCardProps) {
             <p className="text-sm font-medium text-muted-foreground">Balance</p>
             <p
               className={`text-shadow-sm text-3xl font-bold ${
-                balance >= 0 ? "text-green-600" : "text-red-600"
+                balance >= 0 ? "text-money-green" : "text-money-red"
               }`}
             >
               {balance >= 0 ? "+" : "-"}$

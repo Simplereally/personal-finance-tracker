@@ -66,6 +66,9 @@ const config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        "primary-light": "hsl(var(--primary-light))",
+        "money-green": "rgb(79 203 125)",
+        "money-red": "rgb(227 95 95)",
       },
       backgroundImage: {
         "bank-gradient": "linear-gradient(90deg, #0179FE 0%, #4893FF 100%)",
