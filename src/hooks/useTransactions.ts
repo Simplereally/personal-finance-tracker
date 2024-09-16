@@ -1,8 +1,9 @@
-import { addTransaction as addTransactionAction, getTransactions } from "@/server/actions/transaction.actions";
+import { addTransaction as addTransactionAction, deleteTransaction as deleteTransactionAction, getTransactions } from "@/server/actions/transaction.actions";
 import { type TransactionData } from "@/types/supabase";
 import { type AddTransactionResult, type GetTransactionsResult } from "@/types/transaction";
 import { format, startOfDay } from 'date-fns';
 import { useCallback, useState } from 'react';
+import { toast } from 'sonner';
 
 export type TransactionWithFetchedAt = TransactionData & { 
   fetchedAt: number; 
@@ -76,5 +77,17 @@ export function useTransactions() {
     return result;
   }, []);
 
-  return { transactions, fetchTransactions, addTransaction };
+  const deleteTransaction = useCallback(async (transactionId: string): Promise<void> => {
+    const result = await deleteTransactionAction(transactionId);
+    if (result.success) {
+      setTransactions(prevTransactions => 
+        prevTransactions.filter(t => t.id !== transactionId)
+      );
+      toast.success("Transaction deleted successfully");
+    } else {
+      toast.error(result.error ?? "Failed to delete transaction");
+    }
+  }, []);
+
+  return { transactions, fetchTransactions, addTransaction, deleteTransaction };
 }

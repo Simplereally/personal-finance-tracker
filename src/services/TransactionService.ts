@@ -46,6 +46,9 @@ export function createTransactionService(
     async getTransactions(userId: string): Promise<GetTransactionsResult> {
       return await transactionRepository.getTransactions(userId);
     },
+    async deleteTransaction(userId: string, transactionId: string): Promise<{ success: boolean; error?: string }> {
+      return await transactionRepository.deleteTransaction(userId, transactionId);
+    },
   };
 }
 

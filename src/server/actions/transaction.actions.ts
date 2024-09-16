@@ -35,3 +35,12 @@ export async function getTransactions(): Promise<GetTransactionsResult> {
   const result = await transactionService.getTransactions(userResult.userid);
   return result;
 }
+
+export async function deleteTransaction(transactionId: string): Promise<{ success: boolean; error?: string }> {
+  const userResult = await authService.getUser();
+  if (!userResult.success || !userResult.userid) {
+    return { success: false, error: "User not authenticated" };
+  }
+  const result = await transactionService.deleteTransaction(userResult.userid, transactionId);
+  return result;
+}

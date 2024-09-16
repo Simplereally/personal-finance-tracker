@@ -7,7 +7,8 @@ import { useTransactions } from "@/hooks/useTransactions";
 import { useEffect } from "react";
 
 export default function Dashboard() {
-  const { transactions, fetchTransactions, addTransaction } = useTransactions();
+  const { transactions, fetchTransactions, addTransaction, deleteTransaction } =
+    useTransactions();
 
   useEffect(() => {
     void fetchTransactions();
@@ -17,7 +18,10 @@ export default function Dashboard() {
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
       <AddTransactionCard addTransaction={addTransaction} />
       <OverviewCard transactions={transactions} />
-      <TransactionsTable transactions={transactions} />
+      <TransactionsTable
+        transactions={transactions}
+        onDeleteTransaction={deleteTransaction}
+      />
     </div>
   );
 }

@@ -23,6 +23,13 @@ export function createSupabaseTransactionAdapter() {
         `)
         .eq('user_id', userId)
         .order('date', { ascending: false });
+    },
+    async deleteTransaction(userId: string, transactionId: string): Promise<PostgrestResponse<null>> {
+      return await supabase
+        .from('transactions')
+        .delete()
+        .eq('id', transactionId)
+        .eq('user_id', userId);
     }
   };
 }

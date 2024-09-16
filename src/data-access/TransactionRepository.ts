@@ -26,5 +26,10 @@ export function createTransactionRepository(): ITransactionRepository {
       if (error) return { success: false, transactions: [], error: error.message };
       return { success: true, transactions: data || [] };
     },
+    async deleteTransaction(userId: string, transactionId: string): Promise<{ success: boolean; error?: string }> {
+      const { error } = await transactionAdapter.deleteTransaction(userId, transactionId);
+      if (error) return { success: false, error: error.message };
+      return { success: true };
+    },
   };
 }
