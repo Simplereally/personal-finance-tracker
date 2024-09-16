@@ -1,14 +1,12 @@
 import "@/app/globals.css";
-import DynamicThemeProvider from "@/components/DynamicThemeProvider"; // Import the new dynamic component
+import DynamicThemeProvider from "@/components/DynamicThemeProvider";
 import { Toaster } from "@/components/ui/sonner";
 import { type Metadata } from "next";
-import { IBM_Plex_Serif, Inter } from "next/font/google";
+import { Open_Sans } from "next/font/google";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-const ibmPlexSerif = IBM_Plex_Serif({
+const openSans = Open_Sans({
   subsets: ["latin"],
-  weight: ["400", "700"],
-  variable: "--font-ibm-plex-serif",
+  variable: "--font-open-sans",
 });
 
 export const metadata: Metadata = {
@@ -21,8 +19,8 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${ibmPlexSerif.variable}`}>
-      <body>
+    <html lang="en" className={openSans.variable}>
+      <body className={openSans.className}>
         <DynamicThemeProvider>
           {children}
           <Toaster richColors />

@@ -10,9 +10,9 @@ export default async function AuthLayout({
       <header className="border-b border-border bg-secondary">
         <div className="container mx-auto flex items-center justify-between p-4">
           <div className="text-xl font-semibold">
-            <p className="text-2xl font-bold text-secondary-foreground">
+            <h1 className="text-4xl font-bold text-secondary-foreground">
               Financial Tracker
-            </p>
+            </h1>
           </div>
           <LogoutButton />
         </div>

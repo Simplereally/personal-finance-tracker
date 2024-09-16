@@ -19,18 +19,21 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { type TransactionWithFetchedAt } from "@/hooks/useTransactions";
+import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import TransactionRow from "./TransactionRow";
 
 interface TransactionsTableProps {
   transactions: TransactionWithFetchedAt[];
   onDeleteTransaction: (transactionId: string) => Promise<void>;
+  isLoading: boolean;
 }
 
 export default function TransactionsTable({
   transactions,
   onDeleteTransaction,
-}: TransactionsTableProps) {
+  isLoading,
+}: Readonly<TransactionsTableProps>) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [transactionToDelete, setTransactionToDelete] = useState<string | null>(
     null,
@@ -56,26 +59,32 @@ export default function TransactionsTable({
           <CardTitle>Transactions</CardTitle>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Date</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Amount</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {transactions.map((transaction) => (
-                <TransactionRow
-                  key={`${transaction.id}-${transaction.fetchedAt}`}
-                  transaction={transaction}
-                  onDeleteClick={handleDeleteClick}
-                />
-              ))}
-            </TableBody>
-          </Table>
+          {isLoading ? (
+            <div className="flex h-32 items-center justify-center">
+              <Loader2 className="h-8 w-8 animate-spin" />
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Category</TableHead>
+                  <TableHead>Amount</TableHead>
+                  <TableHead>Description</TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {transactions.map((transaction) => (
+                  <TransactionRow
+                    key={`${transaction.id}-${transaction.fetchedAt}`}
+                    transaction={transaction}
+                    onDeleteClick={handleDeleteClick}
+                  />
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
       <AlertDialog

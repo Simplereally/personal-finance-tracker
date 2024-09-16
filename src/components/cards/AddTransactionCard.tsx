@@ -13,7 +13,7 @@ import {
 import { type TransactionData } from "@/types/supabase";
 import { type AddTransactionResult } from "@/types/transaction";
 import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -29,7 +29,7 @@ interface AddTransactionCardProps {
 
 export default function AddTransactionCard({
   addTransaction,
-}: AddTransactionCardProps) {
+}: Readonly<AddTransactionCardProps>) {
   const [date, setDate] = useState<Date>(new Date());
   const [amount, setAmount] = useState("");
   const [category, setCategory] = useState<{
@@ -49,21 +49,26 @@ export default function AddTransactionCard({
     > = {
       amount: parseFloat(amount),
       category_id: category?.value ?? null,
-      date: format(date, "yyyy-MM-dd"), // Use format here to ensure consistent date string
+      date: format(date, "yyyy-MM-dd"),
       description: description || null,
     };
 
-    const result = await addTransaction(transactionData, category?.label);
+    try {
+      const result = await addTransaction(transactionData, category?.label);
 
-    if (result.success) {
-      toast.success("Transaction added successfully");
-      setAmount("");
-      setDescription("");
-    } else {
-      toast.error(result.error ?? "Failed to add transaction");
+      if (result.success) {
+        toast.success("Transaction added successfully");
+        setAmount("");
+        setDescription("");
+      } else {
+        toast.error(result.error ?? "Failed to add transaction");
+      }
+    } catch (error) {
+      console.error("Error adding transaction:", error);
+      toast.error("An unexpected error occurred");
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   return (
@@ -79,22 +84,26 @@ export default function AddTransactionCard({
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             required
+            disabled={isLoading}
           />
           <CategorySelect
             value={category}
             onChange={(newValue) => setCategory(newValue)}
+            isDisabled={isLoading}
           />
           <Input
             type="text"
             placeholder="Description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
+            disabled={isLoading}
           />
           <Popover>
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
                 className="w-full justify-start text-left font-normal"
+                disabled={isLoading}
               >
                 <CalendarIcon className="mr-2 h-4 w-4" />
                 {format(date, "PPP")}
@@ -110,11 +119,19 @@ export default function AddTransactionCard({
                   }
                 }}
                 initialFocus
+                disabled={isLoading}
               />
             </PopoverContent>
           </Popover>
           <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? "Adding..." : "Add Transaction"}
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Adding...
+              </>
+            ) : (
+              "Add Transaction"
+            )}
           </Button>
         </form>
       </CardContent>

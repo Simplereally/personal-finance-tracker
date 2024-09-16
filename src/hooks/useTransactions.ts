@@ -31,8 +31,10 @@ const sortTransactions = (transactions: TransactionWithFetchedAt[]) => {
 
 export function useTransactions() {
   const [transactions, setTransactions] = useState<TransactionWithFetchedAt[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const fetchTransactions = useCallback(async (): Promise<void> => {
+    setIsLoading(true);
     const result: GetTransactionsResult = await getTransactions();
     if (result.success) {
       const standardizedTransactions = result.transactions.map(t => ({
@@ -44,6 +46,7 @@ export function useTransactions() {
       }));
       setTransactions(sortTransactions(standardizedTransactions));
     }
+    setIsLoading(false);
   }, []);
 
   const addTransaction = useCallback(async (
@@ -89,5 +92,5 @@ export function useTransactions() {
     }
   }, []);
 
-  return { transactions, fetchTransactions, addTransaction, deleteTransaction };
+  return { transactions, isLoading, fetchTransactions, addTransaction, deleteTransaction };
 }

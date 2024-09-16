@@ -1,13 +1,16 @@
 import AnimatedCounter from "@/components/AnimatedCounter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { type TransactionWithFetchedAt } from "@/hooks/useTransactions";
+import { Loader2 } from "lucide-react";
 
 interface OverviewCardProps {
   transactions: TransactionWithFetchedAt[];
+  isLoading: boolean;
 }
 
 export default function OverviewCard({
   transactions,
+  isLoading,
 }: Readonly<OverviewCardProps>) {
   const { income, expense } = transactions.reduce(
     (acc, transaction) => {
@@ -22,6 +25,19 @@ export default function OverviewCard({
   );
 
   const balance = income - expense;
+
+  if (isLoading) {
+    return (
+      <Card className="col-span-full md:col-span-1">
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold">Overview</CardTitle>
+        </CardHeader>
+        <CardContent className="flex h-40 items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="col-span-full md:col-span-1">

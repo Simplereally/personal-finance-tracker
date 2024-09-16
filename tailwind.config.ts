@@ -106,6 +106,9 @@ const config = {
       fontFamily: {
         inter: ["var(--font-inter)"],
         "ibm-plex-serif": ["var(--font-ibm-plex-serif)"],
+        'playfair-display': ['var(--font-playfair-display)'],
+        'roboto': ['var(--font-roboto)'],
+        sans: ["var(--font-open-sans)"],
       },
       textShadow: {
         sm: '0 1px 2px rgba(0, 0, 0, 0.1)',
