@@ -33,8 +33,6 @@
 }
 
 @layer base {
-
-  input:-webkit-autofill,
   :root {
     --background: 155 36% 100%;
     --foreground: 255 5% 20%;

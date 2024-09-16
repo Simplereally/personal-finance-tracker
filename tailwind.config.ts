@@ -79,6 +79,7 @@ const config = {
           "0px 1px 3px 0px rgba(16, 24, 40, 0.10), 0px 1px 2px 0px rgba(16, 24, 40, 0.06)",
         profile:
           "0px 12px 16px -4px rgba(16, 24, 40, 0.08), 0px 4px 6px -2px rgba(16, 24, 40, 0.03)",
+        custom: '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)',
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -103,9 +104,22 @@ const config = {
         inter: ["var(--font-inter)"],
         "ibm-plex-serif": ["var(--font-ibm-plex-serif)"],
       },
+      textShadow: {
+        sm: '0 1px 2px rgba(0, 0, 0, 0.1)',
+      },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [
+    require("tailwindcss-animate"),
+    function ({ addUtilities }: { addUtilities: Function }) {
+      const newUtilities = {
+        '.text-shadow-sm': {
+          textShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
+        },
+      };
+      addUtilities(newUtilities);
+    },
+  ],
 } satisfies Config;
 
 export default config;
