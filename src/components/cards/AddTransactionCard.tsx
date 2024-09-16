@@ -48,27 +48,20 @@ export default function AddTransactionCard({
       "user_id" | "id" | "created_at" | "updated_at"
     > = {
       amount: parseFloat(amount),
-      category_id: null,
-      date: date.toISOString().split("T")[0] ?? "",
+      category_id: category?.value ?? null,
+      date: format(date, "yyyy-MM-dd"), // Use format here to ensure consistent date string
       description: description || null,
     };
 
-    let categoryName: string | undefined;
-
-    if (category) {
-      if ("__isNew__" in category) {
-        categoryName = category.label;
-      } else {
-        transactionData.category_id = category.value;
-      }
-    }
-
-    const result = await addTransaction(transactionData, categoryName);
+    const result = await addTransaction(transactionData, category?.label);
 
     if (result.success) {
       toast.success("Transaction added successfully");
       setAmount("");
       setDescription("");
+      // Optionally, you can reset the category and date here if needed
+      // setCategory(null);
+      // setDate(new Date());
     } else {
       toast.error(result.error ?? "Failed to add transaction");
     }

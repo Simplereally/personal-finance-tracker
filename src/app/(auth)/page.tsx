@@ -16,7 +16,7 @@ export default function Dashboard() {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
       <AddTransactionCard addTransaction={addTransaction} />
-      <OverviewCard />
+      <OverviewCard transactions={transactions} />
       <TransactionsTable transactions={transactions} />
     </div>
   );

@@ -1,13 +1,31 @@
 import { addTransaction as addTransactionAction, getTransactions } from "@/server/actions/transaction.actions";
 import { type TransactionData } from "@/types/supabase";
 import { type AddTransactionResult, type GetTransactionsResult } from "@/types/transaction";
+import { format, startOfDay } from 'date-fns';
 import { useCallback, useState } from 'react';
 
-export type TransactionWithFetchedAt = TransactionData & { fetchedAt: number; categories: { id: string; name: string } | null };
+export type TransactionWithFetchedAt = TransactionData & { 
+  fetchedAt: number; 
+  categories: { id: string; name: string } | null;
+  isNew?: boolean;
+};
 
-// Helper function to sort transactions by date
-const sortTransactionsByDate = (transactions: TransactionWithFetchedAt[]) => {
-  return transactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+// Helper function to standardize date
+const standardizeDate = (dateString: string): string => {
+  const date = new Date(dateString);
+  return format(startOfDay(date), "yyyy-MM-dd");
+};
+
+// Helper function to sort transactions by date and then by created_at
+const sortTransactions = (transactions: TransactionWithFetchedAt[]) => {
+  return transactions.sort((a, b) => {
+    const dateComparison = new Date(b.date).getTime() - new Date(a.date).getTime();
+    if (dateComparison === 0) {
+      // If dates are the same, sort by created_at
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    }
+    return dateComparison;
+  });
 };
 
 export function useTransactions() {
@@ -16,10 +34,14 @@ export function useTransactions() {
   const fetchTransactions = useCallback(async (): Promise<void> => {
     const result: GetTransactionsResult = await getTransactions();
     if (result.success) {
-      const sortedTransactions = sortTransactionsByDate(
-        result.transactions.map(t => ({ ...t, fetchedAt: Date.now(), categories: null }))
-      );
-      setTransactions(sortedTransactions);
+      const standardizedTransactions = result.transactions.map(t => ({
+        ...t,
+        date: standardizeDate(t.date),
+        fetchedAt: Date.now(),
+        categories: t.categories,
+        isNew: false
+      }));
+      setTransactions(sortTransactions(standardizedTransactions));
     }
   }, []);
 
@@ -27,21 +49,29 @@ export function useTransactions() {
     transactionData: Omit<TransactionData, "user_id" | "id" | "created_at" | "updated_at">,
     categoryName?: string
   ): Promise<AddTransactionResult> => {
-    const result = await addTransactionAction(transactionData, categoryName);
+    const standardizedTransactionData = {
+      ...transactionData,
+      date: standardizeDate(transactionData.date),
+    };
+    const result = await addTransactionAction(standardizedTransactionData, categoryName);
     if (result.success && result.transactionId) {
       const newTransaction: TransactionWithFetchedAt = {
-        ...transactionData,
+        ...standardizedTransactionData,
         id: result.transactionId,
         user_id: '', // This should be filled with the actual user_id
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         fetchedAt: Date.now(),
-        categories: categoryName ? { id: transactionData.category_id ?? '', name: categoryName } : null
+        categories: categoryName 
+          ? { id: standardizedTransactionData.category_id ?? result.transactionId, name: categoryName } 
+          : null,
+        isNew: true
       };
       setTransactions(prevTransactions => {
         const updatedTransactions = [...prevTransactions, newTransaction];
-        return sortTransactionsByDate(updatedTransactions);
+        return sortTransactions(updatedTransactions);
       });
+      return { ...result, transaction: newTransaction };
     }
     return result;
   }, []);
