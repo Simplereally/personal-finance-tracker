@@ -82,16 +82,13 @@ export default function AddTransactionCard() {
 
     if (result.success) {
       toast.success("Transaction added successfully");
-      // Reset form fields
       setAmount("");
       setCategory(null);
       setDescription("");
       setDate(new Date());
 
-      // Refresh the page with the new transaction ID as a query parameter
-      if (result.newTransactionId) {
-        router.push(`?newTransactionId=${result.newTransactionId}`);
-      }
+      // Refresh the current route
+      router.refresh();
     } else {
       toast.error(result.error ?? "Failed to add transaction");
     }

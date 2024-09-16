@@ -1,5 +1,3 @@
-"use client";
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -9,30 +7,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { getTransactions } from "@/server/actions/transaction.actions";
-import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
 import TransactionRow from "./TransactionRow";
 
-export default function TransactionsTable() {
-  const [transactions, setTransactions] = useState([]);
-  const [newTransactionIds, setNewTransactionIds] = useState(new Set());
-  const searchParams = useSearchParams();
-
-  useEffect(() => {
-    const fetchTransactions = async () => {
-      const result = await getTransactions();
-      if (result.success) {
-        setTransactions(result.transactions);
-      }
-    };
-
-    fetchTransactions();
-
-    const newId = searchParams.get("newTransactionId");
-    if (newId) {
-      setNewTransactionIds((prev) => new Set(prev).add(newId));
-    }
-  }, [searchParams]);
+export default async function TransactionsTable() {
+  const result = await getTransactions();
+  const transactions = result.success ? result.transactions : [];
 
   return (
     <Card className="col-span-full">
@@ -51,11 +30,7 @@ export default function TransactionsTable() {
           </TableHeader>
           <TableBody>
             {transactions.map((transaction) => (
-              <TransactionRow
-                key={transaction.id}
-                transaction={transaction}
-                isNew={newTransactionIds.has(transaction.id)}
-              />
+              <TransactionRow key={transaction.id} transaction={transaction} />
             ))}
           </TableBody>
         </Table>
