@@ -1,3 +1,5 @@
+"use client";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -6,15 +8,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getTransactions } from "@/server/actions/transaction.actions";
+import { type TransactionWithFetchedAt } from "@/hooks/useTransactions";
 import TransactionRow from "./TransactionRow";
 
-export default async function TransactionsTable() {
-  const result = await getTransactions();
-  const transactions = result.success
-    ? result.transactions.map((t) => ({ ...t, fetchedAt: Date.now() }))
-    : [];
+interface TransactionsTableProps {
+  transactions: TransactionWithFetchedAt[];
+}
 
+export default function TransactionsTable({
+  transactions,
+}: TransactionsTableProps) {
   return (
     <Card className="col-span-full">
       <CardHeader>

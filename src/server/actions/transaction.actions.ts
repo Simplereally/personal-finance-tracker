@@ -7,7 +7,6 @@ import { createAuthService } from "@/services/AuthService";
 import { createTransactionService } from "@/services/TransactionService";
 import { type TransactionData } from "@/types/supabase";
 import { type AddTransactionResult, type GetTransactionsResult } from "@/types/transaction";
-import { revalidatePath } from "next/cache";
 
 const transactionRepository = createTransactionRepository();
 const categoryRepository = createCategoryRepository();
@@ -24,9 +23,6 @@ export async function addTransaction(
     return { success: false, error: "User not authenticated" };
   }
   const result = await transactionService.addTransaction(userResult.userid, transactionData, categoryName);
-  if (result.success) {
-    revalidatePath('/');
-  }
   return result;
 }
 
@@ -37,6 +33,5 @@ export async function getTransactions(): Promise<GetTransactionsResult> {
   }
 
   const result = await transactionService.getTransactions(userResult.userid);
-  revalidatePath('/'); // Changed from revalidateTag to revalidatePath
   return result;
 }

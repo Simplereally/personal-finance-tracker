@@ -1,5 +1,6 @@
 "use client";
 
+import { CategorySelect } from "@/components/CategorySelect";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,48 +10,34 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { getCategories } from "@/server/actions/category.actions";
-import { addTransaction } from "@/server/actions/transaction.actions";
-import { type CategoryData, type TransactionData } from "@/types/supabase";
+import { type TransactionData } from "@/types/supabase";
+import { type AddTransactionResult } from "@/types/transaction";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import Creatable from "react-select/creatable";
+import { useState } from "react";
 import { toast } from "sonner";
 
-interface Category {
-  value: string;
-  label: string;
+interface AddTransactionCardProps {
+  addTransaction: (
+    transactionData: Omit<
+      TransactionData,
+      "user_id" | "id" | "created_at" | "updated_at"
+    >,
+    categoryName?: string,
+  ) => Promise<AddTransactionResult>;
 }
 
-export default function AddTransactionCard() {
+export default function AddTransactionCard({
+  addTransaction,
+}: AddTransactionCardProps) {
   const [date, setDate] = useState<Date>(new Date());
   const [amount, setAmount] = useState("");
-  const [category, setCategory] = useState<Category | null>(null);
+  const [category, setCategory] = useState<{
+    value: string;
+    label: string;
+  } | null>(null);
   const [description, setDescription] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [categories, setCategories] = useState<Category[]>([]);
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      const { categories, error } = await getCategories();
-      if (error) {
-        console.error("Error fetching categories:", error);
-        toast.error(error);
-      } else {
-        setCategories(
-          categories.map((cat: CategoryData) => ({
-            value: cat.id,
-            label: cat.name,
-          })),
-        );
-      }
-    };
-    void fetchCategories();
-  }, []);
-
-  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,7 +48,7 @@ export default function AddTransactionCard() {
       "user_id" | "id" | "created_at" | "updated_at"
     > = {
       amount: parseFloat(amount),
-      category_id: null, // We'll set this to null for new categories
+      category_id: null,
       date: date.toISOString().split("T")[0] ?? "",
       description: description || null,
     };
@@ -70,10 +57,8 @@ export default function AddTransactionCard() {
 
     if (category) {
       if ("__isNew__" in category) {
-        // This is a new category
         categoryName = category.label;
       } else {
-        // This is an existing category
         transactionData.category_id = category.value;
       }
     }
@@ -84,9 +69,6 @@ export default function AddTransactionCard() {
       toast.success("Transaction added successfully");
       setAmount("");
       setDescription("");
-
-      // Refresh the current route
-      router.refresh();
     } else {
       toast.error(result.error ?? "Failed to add transaction");
     }
@@ -108,13 +90,7 @@ export default function AddTransactionCard() {
             onChange={(e) => setAmount(e.target.value)}
             required
           />
-          <Creatable
-            isClearable
-            options={categories}
-            value={category}
-            onChange={setCategory}
-            placeholder="Select or create a category..."
-          />
+          <CategorySelect value={category} onChange={setCategory} />
           <Input
             type="text"
             placeholder="Description"

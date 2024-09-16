@@ -1,6 +1,4 @@
-import { type TransactionData } from "@/types/supabase";
-
-export type AddTransactionParams = Omit<TransactionData, "id" | "created_at" | "updated_at">;
+import { type TransactionData } from "./supabase";
 
 export interface AddTransactionResult {
   success: boolean;

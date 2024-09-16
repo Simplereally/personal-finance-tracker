@@ -35,5 +35,18 @@ export interface Database {
   }
 }
 
-export type TransactionData = Database['public']['Tables']['transactions']['Row']
-export type CategoryData = Database['public']['Tables']['categories']['Row']
+export interface TransactionData {
+  id: string;
+  user_id: string;
+  amount: number;
+  category_id: string | null;
+  date: string;
+  description: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CategoryData {
+  id: string;
+  name: string;
+}
