@@ -11,7 +11,9 @@ import TransactionRow from "./TransactionRow";
 
 export default async function TransactionsTable() {
   const result = await getTransactions();
-  const transactions = result.success ? result.transactions : [];
+  const transactions = result.success
+    ? result.transactions.map((t) => ({ ...t, fetchedAt: Date.now() }))
+    : [];
 
   return (
     <Card className="col-span-full">
@@ -30,7 +32,10 @@ export default async function TransactionsTable() {
           </TableHeader>
           <TableBody>
             {transactions.map((transaction) => (
-              <TransactionRow key={transaction.id} transaction={transaction} />
+              <TransactionRow
+                key={`${transaction.id}-${transaction.fetchedAt}`}
+                transaction={transaction}
+              />
             ))}
           </TableBody>
         </Table>

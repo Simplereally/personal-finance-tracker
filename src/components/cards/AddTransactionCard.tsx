@@ -83,9 +83,7 @@ export default function AddTransactionCard() {
     if (result.success) {
       toast.success("Transaction added successfully");
       setAmount("");
-      setCategory(null);
       setDescription("");
-      setDate(new Date());
 
       // Refresh the current route
       router.refresh();
