@@ -14,13 +14,22 @@ export interface AddTransactionResult {
   error?: string;
 }
 
+export interface TransactionWithCategory extends TransactionData {
+  categories: { id: string; name: string } | null;
+}
+
 export interface GetTransactionsResult {
   success: boolean;
-  transactions: TransactionData[];
+  transactions: TransactionWithCategory[];
   error?: string;
 }
 
 export interface DeleteTransactionResult {
   success: boolean;
   error?: string;
+}
+
+export interface TransactionWithFetchedAt extends TransactionWithCategory {
+  fetchedAt: number;
+  isNew?: boolean;
 }

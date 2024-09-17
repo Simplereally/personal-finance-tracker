@@ -1,15 +1,8 @@
 import { addTransaction as addTransactionAction, deleteTransaction as deleteTransactionAction, getTransactions } from "@/server/actions/transaction.actions";
-import { type TransactionData } from "@/types/supabase";
-import { type AddTransactionParams, type AddTransactionResult, type DeleteTransactionResult, type GetTransactionsResult } from "@/types/transaction";
+import { type AddTransactionParams, type AddTransactionResult, type DeleteTransactionResult, type GetTransactionsResult, type TransactionWithFetchedAt } from "@/types/transaction";
 import { format, startOfDay } from 'date-fns';
 import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
-
-export type TransactionWithFetchedAt = TransactionData & { 
-  fetchedAt: number; 
-  categories: { id: string; name: string } | null;
-  isNew?: boolean;
-};
 
 // Helper function to standardize date
 const standardizeDate = (dateString: string): string => {
@@ -41,7 +34,6 @@ export function useTransactions() {
         ...t,
         date: standardizeDate(t.date),
         fetchedAt: Date.now(),
-        categories: t.categories,
         isNew: false
       }));
       setTransactions(sortTransactions(standardizedTransactions));
@@ -75,7 +67,7 @@ export function useTransactions() {
         const updatedTransactions = [...prevTransactions, newTransaction];
         return sortTransactions(updatedTransactions);
       });
-      return { ...result, transaction: newTransaction };
+      return { ...result, transactionId: newTransaction.id };
     }
     return result;
   }, []);

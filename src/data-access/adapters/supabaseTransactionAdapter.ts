@@ -23,7 +23,7 @@ export function createSupabaseTransactionAdapter() {
         .eq('user_id', userId)
         .order('date', { ascending: false });
     },
-    async deleteTransaction(userId: string, transactionId: string): Promise<PostgrestResponse<null>> {
+    async deleteTransaction(userId: string, transactionId: string): Promise<PostgrestSingleResponse<null>> {
       return await supabase
         .from('transactions')
         .delete()
