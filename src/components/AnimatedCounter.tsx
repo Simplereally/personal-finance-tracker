@@ -8,15 +8,21 @@ interface AnimatedCounterProps {
 }
 
 const AnimatedCounter = ({ decimal = 0, amount }: AnimatedCounterProps) => {
-  const [prevAmount, setPrevAmount] = useState(amount);
+  const [prevAmount, setPrevAmount] = useState(0);
+  const [hasInitialized, setHasInitialized] = useState(false);
 
   useEffect(() => {
+    if (!hasInitialized) {
+      setHasInitialized(true);
+      return;
+    }
+
     const timer = setTimeout(() => {
       setPrevAmount(amount);
     }, 1000);
 
     return () => clearTimeout(timer);
-  }, [amount]);
+  }, [amount, hasInitialized]);
 
   return (
     <CountUp

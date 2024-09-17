@@ -2,6 +2,7 @@ import AnimatedCounter from "@/components/AnimatedCounter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { type TransactionWithFetchedAt } from "@/types/transaction";
 import { Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
 
 interface OverviewCardProps {
   transactions: TransactionWithFetchedAt[];
@@ -12,6 +13,8 @@ export default function OverviewCard({
   transactions,
   isLoading,
 }: Readonly<OverviewCardProps>) {
+  const [shouldAnimate, setShouldAnimate] = useState(false);
+
   const { income, expense } = transactions.reduce(
     (acc, transaction) => {
       if (transaction.amount > 0) {
@@ -25,6 +28,12 @@ export default function OverviewCard({
   );
 
   const balance = income - expense;
+
+  useEffect(() => {
+    if (!isLoading) {
+      setShouldAnimate(true);
+    }
+  }, [isLoading]);
 
   if (isLoading) {
     return (
@@ -50,14 +59,22 @@ export default function OverviewCard({
             <p className="text-sm font-medium text-muted-foreground">Income</p>
             <p className="text-shadow-sm text-money-green text-2xl font-bold">
               +$
-              <AnimatedCounter decimal={2} amount={income} />
+              {shouldAnimate ? (
+                <AnimatedCounter decimal={2} amount={income} />
+              ) : (
+                "0.00"
+              )}
             </p>
           </div>
           <div className="space-y-2">
             <p className="text-sm font-medium text-muted-foreground">Expense</p>
             <p className="text-shadow-sm text-money-red text-2xl font-bold">
               -$
-              <AnimatedCounter decimal={2} amount={expense} />
+              {shouldAnimate ? (
+                <AnimatedCounter decimal={2} amount={expense} />
+              ) : (
+                "0.00"
+              )}
             </p>
           </div>
         </div>
@@ -70,7 +87,11 @@ export default function OverviewCard({
               }`}
             >
               {balance >= 0 ? "+" : "-"}$
-              <AnimatedCounter decimal={2} amount={Math.abs(balance)} />
+              {shouldAnimate ? (
+                <AnimatedCounter decimal={2} amount={Math.abs(balance)} />
+              ) : (
+                "0.00"
+              )}
             </p>
           </div>
         </div>
