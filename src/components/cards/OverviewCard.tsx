@@ -1,6 +1,6 @@
 import AnimatedCounter from "@/components/AnimatedCounter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { type TransactionWithFetchedAt } from "@/hooks/useTransactions";
+import { type TransactionWithFetchedAt } from "@/types/transaction";
 import { Loader2 } from "lucide-react";
 
 interface OverviewCardProps {

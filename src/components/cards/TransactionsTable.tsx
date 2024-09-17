@@ -18,7 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { type TransactionWithFetchedAt } from "@/hooks/useTransactions";
+import { type TransactionWithFetchedAt } from "@/types/transaction";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import TransactionRow from "./TransactionRow";

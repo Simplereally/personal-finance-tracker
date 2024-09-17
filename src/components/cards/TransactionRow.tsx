@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { TableCell } from "@/components/ui/table";
-import { type TransactionWithFetchedAt } from "@/hooks/useTransactions";
+import { type TransactionWithFetchedAt } from "@/types/transaction";
 import { format, parseISO } from "date-fns";
 import { motion } from "framer-motion";
 import { MoreHorizontal, Trash } from "lucide-react";
