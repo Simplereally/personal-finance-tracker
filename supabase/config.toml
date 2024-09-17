@@ -44,7 +44,7 @@ enable_anonymous_sign_ins = false
 enable_manual_linking = false
 
 [auth.jwt]
-secret = "SUPABASE_JWT_SECRET"
+secret = "SUPABASE_JWT_SECRET_PLACEHOLDER"
 
 [realtime]
 enabled = false
