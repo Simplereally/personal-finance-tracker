@@ -17,7 +17,12 @@ export function createTransactionService(
       if (!categoryId && categoryName) {
         const categoryResult = await categoryRepository.createCategory(userId, categoryName);
         if (categoryResult.success && categoryResult.categories.length > 0) {
-          categoryId = categoryResult.categories[0].id;
+          const newCategory = categoryResult.categories[0];
+          if (newCategory?.id) {
+            categoryId = newCategory.id;
+          } else {
+            return { success: false, error: "Failed to create category: Invalid category data" };
+          }
         } else {
           return { success: false, error: "Failed to create category" };
         }
