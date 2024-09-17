@@ -1,4 +1,4 @@
-project_id = "your-supabase-project-id"
+project_id = "personal-finance-tracker"
 
 [api]
 enabled = true
@@ -42,6 +42,9 @@ enable_signup = true
 enable_anonymous_sign_ins = false
 # Allow/disallow testing manual linking of accounts
 enable_manual_linking = false
+
+[auth.jwt]
+secret = "SUPABASE_JWT_SECRET"
 
 [realtime]
 enabled = false
