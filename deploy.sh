@@ -7,7 +7,7 @@ if ! command -v supabase &> /dev/null; then
 fi
 
 # Authenticate Supabase CLI
-supabase login --access-token "$SUPABASE_ACCESS_TOKEN"
+supabase login --token "$SUPABASE_ACCESS_TOKEN"
 
 # Link to the Supabase project
 supabase link --project-ref "$SUPABASE_PROJECT_ID"
