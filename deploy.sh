@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-# Replace placeholders in config.toml with actual secrets
-sed -i "s|SUPABASE_JWT_SECRET|${SUPABASE_JWT_SECRET}|g" supabase/config.toml
+# Set the JWT secret using an environment variable
+export SUPABASE_AUTH_JWT_SECRET="$SUPABASE_JWT_SECRET"
 
 # Run database migrations
 npx supabase db push

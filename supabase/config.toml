@@ -43,9 +43,6 @@ enable_anonymous_sign_ins = false
 # Allow/disallow testing manual linking of accounts
 enable_manual_linking = false
 
-[auth.jwt]
-secret = "SUPABASE_JWT_SECRET_PLACEHOLDER"
-
 [realtime]
 enabled = false
 
