@@ -1,19 +1,24 @@
 #!/bin/bash
 set -e
 
+echo "Starting deployment script"
+
 # Install Supabase CLI if not already installed
 if ! command -v supabase &> /dev/null; then
+    echo "Installing Supabase CLI"
     npm install -g supabase
 fi
 
-# Authenticate Supabase CLI
-echo "$SUPABASE_ACCESS_TOKEN" | supabase login
+echo "Setting up Supabase credentials"
+export SUPABASE_ACCESS_TOKEN
 
-# Link to the Supabase project
-supabase link --project-ref "$SUPABASE_PROJECT_ID" --password-stdin <<< "$SUPABASE_DB_PASSWORD"
+echo "Linking to Supabase project"
+supabase link --project-ref "$SUPABASE_PROJECT_ID"
 
-# Run database migrations
+echo "Running database migrations"
 supabase db push
 
-# Build the Next.js app
+echo "Building Next.js app"
 npm run build
+
+echo "Deployment script completed"
