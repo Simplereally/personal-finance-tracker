@@ -1,4 +1,4 @@
-project_id = "personal-finance-tracker"
+project_id = "your-supabase-project-id"
 
 [api]
 enabled = true
