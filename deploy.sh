@@ -7,10 +7,10 @@ if ! command -v supabase &> /dev/null; then
 fi
 
 # Authenticate Supabase CLI
-supabase login --token "$SUPABASE_ACCESS_TOKEN"
+echo "$SUPABASE_ACCESS_TOKEN" | supabase login
 
 # Link to the Supabase project
-supabase link --project-ref "$SUPABASE_PROJECT_ID"
+supabase link --project-ref "$SUPABASE_PROJECT_ID" --password-stdin <<< "$SUPABASE_DB_PASSWORD"
 
 # Run database migrations
 supabase db push
