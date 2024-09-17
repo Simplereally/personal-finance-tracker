@@ -46,19 +46,22 @@ export function CategorySelect({
     void fetchCategories();
   }, []);
 
-  const handleCreateCategory = async (inputValue: string) => {
-    const result = await createCategory(inputValue);
-    if (result.success && result.categories.length > 0) {
-      const newCategory = {
-        value: result.categories[0]?.id ?? "",
-        label: result.categories[0]?.name ?? "",
-      };
-      setCategories((prev) => [...prev, newCategory]);
-      onChange(newCategory);
-    } else {
-      toast.error(result.error ?? "Failed to create category");
-    }
-  };
+  const handleCreateCategory = useCallback(
+    async (inputValue: string) => {
+      const result = await createCategory(inputValue);
+      if (result.success && result.categories.length > 0) {
+        const newCategory = {
+          value: result.categories[0]?.id ?? "",
+          label: result.categories[0]?.name ?? "",
+        };
+        setCategories((prev) => [...prev, newCategory]);
+        onChange(newCategory);
+      } else {
+        toast.error(result.error ?? "Failed to create category");
+      }
+    },
+    [onChange],
+  );
 
   const handleCategoryChange = useCallback(
     (newCategory: Category | null, actionMeta: { action: string }) => {
@@ -68,7 +71,7 @@ export function CategorySelect({
         onChange(newCategory);
       }
     },
-    [onChange],
+    [onChange, handleCreateCategory],
   );
 
   return (
