@@ -7,7 +7,6 @@ export function createSupabaseTransactionAdapter() {
   const supabase = createClient();
   return {
     async addTransaction(transaction: AddTransactionParams): Promise<PostgrestSingleResponse<TransactionData>> {
-      console.log(transaction)
       return await supabase
         .from('transactions')
         .insert(transaction)

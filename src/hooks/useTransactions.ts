@@ -1,6 +1,6 @@
 import { addTransaction as addTransactionAction, deleteTransaction as deleteTransactionAction, getTransactions } from "@/server/actions/transaction.actions";
 import { type TransactionData } from "@/types/supabase";
-import { type AddTransactionResult, type GetTransactionsResult } from "@/types/transaction";
+import { type AddTransactionParams, type AddTransactionResult, type DeleteTransactionResult, type GetTransactionsResult } from "@/types/transaction";
 import { format, startOfDay } from 'date-fns';
 import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
@@ -50,7 +50,7 @@ export function useTransactions() {
   }, []);
 
   const addTransaction = useCallback(async (
-    transactionData: Omit<TransactionData, "user_id" | "id" | "created_at" | "updated_at">,
+    transactionData: Omit<AddTransactionParams, "user_id">,
     categoryName?: string
   ): Promise<AddTransactionResult> => {
     const standardizedTransactionData = {
@@ -81,7 +81,7 @@ export function useTransactions() {
   }, []);
 
   const deleteTransaction = useCallback(async (transactionId: string): Promise<void> => {
-    const result = await deleteTransactionAction(transactionId);
+    const result: DeleteTransactionResult = await deleteTransactionAction(transactionId);
     if (result.success) {
       setTransactions(prevTransactions => 
         prevTransactions.filter(t => t.id !== transactionId)

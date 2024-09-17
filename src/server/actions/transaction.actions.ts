@@ -5,8 +5,7 @@ import { createCategoryRepository } from "@/data-access/CategoryRepository";
 import { createTransactionRepository } from "@/data-access/TransactionRepository";
 import { createAuthService } from "@/services/AuthService";
 import { createTransactionService } from "@/services/TransactionService";
-import { type TransactionData } from "@/types/supabase";
-import { type AddTransactionResult, type GetTransactionsResult } from "@/types/transaction";
+import { type AddTransactionParams, type AddTransactionResult, type DeleteTransactionResult, type GetTransactionsResult } from "@/types/transaction";
 
 const transactionRepository = createTransactionRepository();
 const categoryRepository = createCategoryRepository();
@@ -15,15 +14,14 @@ const authRepository = createAuthRepository();
 const authService = createAuthService(authRepository);
 
 export async function addTransaction(
-  transactionData: Omit<TransactionData, "user_id" | "id" | "created_at" | "updated_at">,
+  transactionData: Omit<AddTransactionParams, "user_id">,
   categoryName?: string
 ): Promise<AddTransactionResult> {
   const userResult = await authService.getUser();
   if (!userResult.success || !userResult.userid) {
     return { success: false, error: "User not authenticated" };
   }
-  const result = await transactionService.addTransaction(userResult.userid, transactionData, categoryName);
-  return result;
+  return await transactionService.addTransaction(userResult.userid, transactionData, categoryName);
 }
 
 export async function getTransactions(): Promise<GetTransactionsResult> {
@@ -32,15 +30,13 @@ export async function getTransactions(): Promise<GetTransactionsResult> {
     return { success: false, transactions: [], error: "User not authenticated" };
   }
 
-  const result = await transactionService.getTransactions(userResult.userid);
-  return result;
+  return await transactionService.getTransactions(userResult.userid);
 }
 
-export async function deleteTransaction(transactionId: string): Promise<{ success: boolean; error?: string }> {
+export async function deleteTransaction(transactionId: string): Promise<DeleteTransactionResult> {
   const userResult = await authService.getUser();
   if (!userResult.success || !userResult.userid) {
     return { success: false, error: "User not authenticated" };
   }
-  const result = await transactionService.deleteTransaction(userResult.userid, transactionId);
-  return result;
+  return await transactionService.deleteTransaction(userResult.userid, transactionId);
 }
