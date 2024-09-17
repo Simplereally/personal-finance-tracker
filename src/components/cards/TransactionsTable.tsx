@@ -38,16 +38,39 @@ export default function TransactionsTable({
   const [transactionToDelete, setTransactionToDelete] = useState<string | null>(
     null,
   );
+  const [deletingTransactions, setDeletingTransactions] = useState<Set<string>>(
+    new Set(),
+  );
 
   const handleDeleteClick = (transactionId: string) => {
     setTransactionToDelete(transactionId);
     setIsDeleteDialogOpen(true);
   };
 
-  const handleDeleteConfirm = async () => {
+  const handleDeleteConfirm = () => {
     if (transactionToDelete) {
-      await onDeleteTransaction(transactionToDelete);
+      setDeletingTransactions((prev) => new Set(prev).add(transactionToDelete));
       setIsDeleteDialogOpen(false);
+
+      // Wait for the animation to complete before actually deleting
+      setTimeout(() => {
+        void deleteTransactionAfterDelay(transactionToDelete);
+      }, 500);
+    }
+  };
+
+  const deleteTransactionAfterDelay = async (id: string) => {
+    try {
+      await onDeleteTransaction(id);
+    } catch (error) {
+      console.error("Failed to delete transaction:", error);
+      // Optionally, show an error toast here
+    } finally {
+      setDeletingTransactions((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(id);
+        return newSet;
+      });
       setTransactionToDelete(null);
     }
   };
@@ -80,6 +103,7 @@ export default function TransactionsTable({
                     key={`${transaction.id}-${transaction.fetchedAt}`}
                     transaction={transaction}
                     onDeleteClick={handleDeleteClick}
+                    isDeleting={deletingTransactions.has(transaction.id)}
                   />
                 ))}
               </TableBody>
