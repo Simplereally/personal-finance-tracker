@@ -16,7 +16,6 @@ export default function LogoutButton() {
       const response = await signOut();
       if (response.success) {
         router.push("/login");
-        router.refresh(); // Refresh to update the auth state
       } else {
         toast.error(response.error ?? "Logout failed. Please try again.");
       }
@@ -29,7 +28,7 @@ export default function LogoutButton() {
   };
 
   return (
-    <Button onClick={handleLogout} variant="outline" disabled={isLoading}>
+    <Button onClick={handleLogout} variant="secondary" disabled={isLoading}>
       {isLoading ? "Logging out..." : "Logout"}
     </Button>
   );

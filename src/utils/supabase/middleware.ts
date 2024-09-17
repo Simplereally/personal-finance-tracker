@@ -3,7 +3,6 @@ import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
 export async function updateSession(request: NextRequest) {
-  console.log("[Middleware] Updating session");
   let response = NextResponse.next({
     request: {
       headers: request.headers,
@@ -43,8 +42,6 @@ export async function updateSession(request: NextRequest) {
   const {
     data: { session },
   } = await supabase.auth.getSession();
-
-  console.log("[Middleware] Session:", session ? "Found" : "Not found");
 
   return { response, session };
 }

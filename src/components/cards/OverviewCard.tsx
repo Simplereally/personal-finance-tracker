@@ -56,7 +56,7 @@ export default function OverviewCard({
       <CardContent className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <p className="text-sm font-medium text-muted-foreground">Income</p>
+            <p className="text-lg font-medium text-muted-foreground">Income</p>
             <p className="text-shadow-sm text-money-green text-2xl font-bold">
               +$
               {shouldAnimate ? (
@@ -67,7 +67,7 @@ export default function OverviewCard({
             </p>
           </div>
           <div className="space-y-2">
-            <p className="text-sm font-medium text-muted-foreground">Expense</p>
+            <p className="text-lg font-medium text-muted-foreground">Expense</p>
             <p className="text-shadow-sm text-money-red text-2xl font-bold">
               -$
               {shouldAnimate ? (
@@ -80,7 +80,7 @@ export default function OverviewCard({
         </div>
         <div className="border-t pt-4">
           <div className="space-y-2">
-            <p className="text-sm font-medium text-muted-foreground">Balance</p>
+            <p className="text-lg font-medium text-muted-foreground">Balance</p>
             <p
               className={`text-shadow-sm text-3xl font-bold ${
                 balance >= 0 ? "text-money-green" : "text-money-red"

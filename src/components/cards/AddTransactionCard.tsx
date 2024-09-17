@@ -74,7 +74,7 @@ export default function AddTransactionCard({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Add Transaction</CardTitle>
+        <CardTitle className="text-2xl font-bold">Add Transaction</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">

@@ -56,7 +56,7 @@ export default function TransactionsTable({
     <>
       <Card className="col-span-full">
         <CardHeader>
-          <CardTitle>Transactions</CardTitle>
+          <CardTitle className="text-2xl font-bold">Transactions</CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? (

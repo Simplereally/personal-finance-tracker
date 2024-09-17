@@ -20,7 +20,6 @@ export function createSupabaseCategoryAdapter() {
         .eq('name', name);
     },
     async createCategory(userId: string, name: string): Promise<PostgrestSingleResponse<CategoryData>> {
-      console.log("[Adapter] Creating category: ", userId, name)
       return await supabase
         .from('categories')
         .insert({ user_id: userId, name })
