@@ -43,7 +43,9 @@ const SignUpForm = () => {
     try {
       await signUp(data);
       router.push("/");
-      toast.success("Account created successfully!");
+      toast.success(
+        "Account created successfully! Please check your email for verification.",
+      );
     } catch (error) {
       console.error("Error during form submission:", error);
       toast.error("Failed to create account. Please try again.");
