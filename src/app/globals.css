@@ -61,6 +61,8 @@
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
+    --sidebar-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    --sidebar-border: rgba(0, 0, 0, 0.1);
   }
 
   .dark {
@@ -90,6 +92,8 @@
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
     --radius: 0.5rem;
+    --sidebar-shadow: 0 0 15px rgba(255, 255, 255, 0.014);
+    --sidebar-border: rgba(255, 255, 255, 0.1);
   }
 
   .soft {
@@ -119,6 +123,8 @@
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
+    --sidebar-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+    --sidebar-border: rgba(0, 0, 0, 0.05);
   }
 
   /* Ensure that when no class is applied, light theme is used */
@@ -149,6 +155,8 @@
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
+    --sidebar-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    --sidebar-border: rgba(0, 0, 0, 0.1);
   }
 }
 
@@ -375,6 +383,14 @@
 
   .sidebar-label {
     @apply text-16 font-semibold max-xl:hidden;
+  }
+
+  .shadow-sidebar {
+    box-shadow: var(--sidebar-shadow);
+  }
+
+  .border-sidebar {
+    border-color: var(--sidebar-border);
   }
 }
 

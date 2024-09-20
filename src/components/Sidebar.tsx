@@ -50,7 +50,7 @@ export function Sidebar({
         {isOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
       </Button>
       <motion.div
-        className="fixed left-0 top-0 z-40 h-full w-64 bg-background shadow-lg md:hidden"
+        className="shadow-sidebar border-sidebar fixed left-0 top-0 z-40 h-full w-64 border-r bg-background md:hidden"
         initial="closed"
         animate={isOpen ? "open" : "closed"}
         variants={{
@@ -84,7 +84,7 @@ export function Sidebar({
       </motion.div>
       <div className="hidden md:block">
         <motion.div
-          className="fixed left-0 top-0 z-40 h-full bg-background shadow-lg"
+          className="shadow-sidebar border-sidebar fixed left-0 top-0 z-40 h-full border-r bg-background"
           initial="expanded"
           animate={isExpanded ? "expanded" : "collapsed"}
           variants={sidebarVariants}

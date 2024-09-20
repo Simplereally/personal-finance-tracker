@@ -8,13 +8,9 @@ export default function AuthLayout({
 }>) {
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
-      <header className="border-b border-border bg-secondary">
+      <header>
         <div className="container mx-auto flex items-center justify-between p-4">
-          <div className="text-xl font-semibold">
-            <h1 className="inline-block rounded-lg bg-primary px-4 py-2 text-4xl font-bold text-primary-foreground">
-              Financial Tracker
-            </h1>
-          </div>
+          <div className="text-xl font-semibold"></div>
           <div className="flex items-center gap-4">
             <ThemeSwitcher />
             <LogoutButton />

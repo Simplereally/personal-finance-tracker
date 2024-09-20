@@ -53,7 +53,7 @@ export default function TransactionRow({
           </TableCell>
           <TableCell
             className={
-              transaction.amount < 0 ? "text-money-red" : "text-money-green"
+              transaction.amount < 0 ? "text-red-500" : "text-money-green"
             }
           >
             ${Math.abs(transaction.amount).toFixed(2)}
