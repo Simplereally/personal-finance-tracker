@@ -5,7 +5,7 @@ import { createCategoryRepository } from "@/data-access/CategoryRepository";
 import { createTransactionRepository } from "@/data-access/TransactionRepository";
 import { createAuthService } from "@/services/AuthService";
 import { createTransactionService } from "@/services/TransactionService";
-import { type AddTransactionParams, type AddTransactionResult, type DeleteTransactionResult, type GetTransactionsResult, type UpdateTransactionParams } from "@/types/transaction";
+import { type AddTransactionParams, type AddTransactionResult, type DeleteTransactionResult, type EditTransactionResult, type GetTransactionsResult, type UpdateTransactionParams } from "@/types/transaction";
 
 const transactionRepository = createTransactionRepository();
 const categoryRepository = createCategoryRepository();

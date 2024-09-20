@@ -48,7 +48,7 @@ export function useTransactions() {
     const standardizedTransactionData = {
       ...transactionData,
       date: standardizeDate(transactionData.date),
-      amount: Number(transactionData.amount).toFixed(2), // Ensure amount is rounded to 2 decimal places
+      amount: Number(transactionData.amount), // Ensure amount is rounded to 2 decimal places
     };
     const result = await addTransactionAction(standardizedTransactionData, categoryName);
     if (result.success && result.transactionId) {
@@ -90,14 +90,15 @@ export function useTransactions() {
     updatedData: UpdateTransactionParams
   ): Promise<void> => {
     const result = await editTransactionAction(transactionId, updatedData);
-    if (result.success) {
+    if (result.success && result.transaction) {
       setTransactions(prevTransactions =>
         prevTransactions.map(t =>
-          t.id === transactionId ? { ...t, ...updatedData, updated_at: new Date().toISOString() } : t
+          t.id === transactionId ? { ...t, ...result.transaction, updated_at: new Date().toISOString() } : t
         )
       );
       toast.success("Transaction updated successfully");
     } else {
+      console.error(result.error);
       toast.error(result.error ?? "Failed to update transaction");
     }
   }, []);
