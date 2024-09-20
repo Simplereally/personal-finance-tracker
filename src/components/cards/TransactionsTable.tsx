@@ -15,7 +15,6 @@ import {
 } from "@/types/transaction";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
 import TransactionRow from "./TransactionRow";
 
 interface TransactionsTableProps {
@@ -72,19 +71,6 @@ export default function TransactionsTable({
         return newSet;
       });
       setTransactionToDelete(null);
-    }
-  };
-
-  const handleEditTransaction = async (
-    transactionId: string,
-    updatedData: UpdateTransactionParams,
-  ) => {
-    try {
-      await onEditTransaction(transactionId, updatedData);
-      toast.success("Transaction updated successfully");
-    } catch (error) {
-      console.error("Failed to update transaction:", error);
-      toast.error("Failed to update transaction");
     }
   };
 

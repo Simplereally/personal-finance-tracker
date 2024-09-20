@@ -48,6 +48,7 @@ export function useTransactions() {
     const standardizedTransactionData = {
       ...transactionData,
       date: standardizeDate(transactionData.date),
+      amount: Number(transactionData.amount).toFixed(2), // Ensure amount is rounded to 2 decimal places
     };
     const result = await addTransactionAction(standardizedTransactionData, categoryName);
     if (result.success && result.transactionId) {

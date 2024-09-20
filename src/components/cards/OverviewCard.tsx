@@ -17,10 +17,11 @@ export default function OverviewCard({
 
   const { income, expense } = transactions.reduce(
     (acc, transaction) => {
-      if (transaction.amount > 0) {
-        acc.income += transaction.amount;
+      const amount = Number(transaction.amount);
+      if (amount > 0) {
+        acc.income += amount;
       } else {
-        acc.expense += Math.abs(transaction.amount);
+        acc.expense += Math.abs(amount);
       }
       return acc;
     },
@@ -62,7 +63,7 @@ export default function OverviewCard({
               {shouldAnimate ? (
                 <AnimatedCounter decimal={2} amount={income} />
               ) : (
-                "0.00"
+                income.toFixed(2)
               )}
             </p>
           </div>
@@ -73,7 +74,7 @@ export default function OverviewCard({
               {shouldAnimate ? (
                 <AnimatedCounter decimal={2} amount={expense} />
               ) : (
-                "0.00"
+                expense.toFixed(2)
               )}
             </p>
           </div>
@@ -90,7 +91,7 @@ export default function OverviewCard({
               {shouldAnimate ? (
                 <AnimatedCounter decimal={2} amount={Math.abs(balance)} />
               ) : (
-                "0.00"
+                Math.abs(balance).toFixed(2)
               )}
             </p>
           </div>

@@ -67,6 +67,8 @@ export function CategorySelect({
     (newCategory: Category | null, actionMeta: { action: string }) => {
       if (actionMeta.action === "create-option") {
         void handleCreateCategory(newCategory?.label ?? "");
+      } else if (actionMeta.action === "clear") {
+        onChange(null);
       } else {
         onChange(newCategory);
       }
@@ -80,7 +82,6 @@ export function CategorySelect({
       isClearable
       options={categories}
       value={value}
-      required
       onChange={handleCategoryChange}
       placeholder="Select or create a category..."
       classNames={{

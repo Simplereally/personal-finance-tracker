@@ -2,18 +2,13 @@
 
 import { CategorySelect } from "@/components/CategorySelect";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { DatePicker } from "@/components/ui/DatePicker";
 import { Input } from "@/components/ui/input";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { type TransactionData } from "@/types/supabase";
 import { type AddTransactionResult } from "@/types/transaction";
 import { format } from "date-fns";
-import { CalendarIcon, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -43,11 +38,18 @@ export default function AddTransactionCard({
     e.preventDefault();
     setIsLoading(true);
 
+    const parsedAmount = parseFloat(amount);
+    if (isNaN(parsedAmount)) {
+      toast.error("Invalid amount");
+      setIsLoading(false);
+      return;
+    }
+
     const transactionData: Omit<
       TransactionData,
       "user_id" | "id" | "created_at" | "updated_at"
     > = {
-      amount: parseFloat(amount),
+      amount: parsedAmount,
       category_id: category?.value ?? null,
       date: format(date, "yyyy-MM-dd"),
       description: description || null,
@@ -107,31 +109,7 @@ export default function AddTransactionCard({
             onChange={(e) => setDescription(e.target.value)}
             disabled={isLoading}
           />
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className="w-full justify-start text-left font-normal"
-                disabled={isLoading}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {format(date, "PPP")}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0">
-              <Calendar
-                mode="single"
-                selected={date}
-                onSelect={(newDate: Date | undefined) => {
-                  if (newDate) {
-                    setDate(newDate);
-                  }
-                }}
-                initialFocus
-                disabled={isLoading}
-              />
-            </PopoverContent>
-          </Popover>
+          <DatePicker date={date} onDateChange={setDate} />
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? (
               <>

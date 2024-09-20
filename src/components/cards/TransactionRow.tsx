@@ -2,6 +2,7 @@
 
 import { CategorySelect } from "@/components/CategorySelect";
 import { Button } from "@/components/ui/button";
+import { DatePicker } from "@/components/ui/DatePicker";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -72,7 +73,22 @@ export default function TransactionRow({
     field: keyof UpdateTransactionParams,
     value: string | number,
   ) => {
-    setEditedTransaction((prev) => ({ ...prev, [field]: value }));
+    if (/^-?\d*\.?\d*$/.test(value.toString()) || value === "") {
+      console.log(value);
+      setEditedTransaction((prev) => ({ ...prev, [field]: value }));
+    }
+  };
+
+  const handleCategoryChange = (
+    newCategory: { value: string; label: string } | null,
+  ) => {
+    setEditedTransaction((prev) => ({
+      ...prev,
+      category_id: newCategory?.value ?? null,
+      categories: newCategory
+        ? { id: newCategory.value, name: newCategory.label }
+        : null,
+    }));
   };
 
   const formattedDate = format(parseISO(editedTransaction.date), "dd/MM/yyyy");
@@ -88,10 +104,11 @@ export default function TransactionRow({
         >
           <TableCell>
             {isEditing ? (
-              <Input
-                type="date"
-                value={editedTransaction.date}
-                onChange={(e) => handleInputChange("date", e.target.value)}
+              <DatePicker
+                date={parseISO(editedTransaction.date)}
+                onDateChange={(newDate) =>
+                  handleInputChange("date", format(newDate, "yyyy-MM-dd"))
+                }
               />
             ) : (
               formattedDate
@@ -100,13 +117,15 @@ export default function TransactionRow({
           <TableCell>
             {isEditing ? (
               <CategorySelect
-                value={{
-                  value: editedTransaction.category_id ?? "",
-                  label: editedTransaction.categories?.name ?? "",
-                }}
-                onChange={(newCategory) =>
-                  handleInputChange("category_id", newCategory?.value ?? null)
+                value={
+                  editedTransaction.category_id
+                    ? {
+                        value: editedTransaction.category_id,
+                        label: editedTransaction.categories?.name ?? "",
+                      }
+                    : null
                 }
+                onChange={handleCategoryChange}
                 isDisabled={false}
               />
             ) : (
@@ -120,15 +139,11 @@ export default function TransactionRow({
           >
             {isEditing ? (
               <Input
-                type="number"
-                value={Math.abs(editedTransaction.amount)}
-                onChange={(e) =>
-                  handleInputChange(
-                    "amount",
-                    parseFloat(e.target.value) *
-                      (editedTransaction.amount < 0 ? -1 : 1),
-                  )
-                }
+                type="text"
+                inputMode="decimal"
+                placeholder="Amount e.g. 20 or -20"
+                value={editedTransaction.amount}
+                onChange={(e) => handleInputChange("amount", e.target.value)}
               />
             ) : (
               `$${Math.abs(editedTransaction.amount).toFixed(2)}`
