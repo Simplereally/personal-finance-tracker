@@ -13,6 +13,7 @@ export default function DashboardContent() {
     fetchTransactions,
     addTransaction,
     deleteTransaction,
+    editTransaction,
   } = useTransactions();
 
   useEffect(() => {
@@ -33,6 +34,7 @@ export default function DashboardContent() {
         <TransactionsTable
           transactions={transactions}
           onDeleteTransaction={deleteTransaction}
+          onEditTransaction={editTransaction}
           isLoading={isLoading}
         />
       </div>

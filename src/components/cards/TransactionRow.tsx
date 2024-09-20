@@ -1,5 +1,6 @@
 "use client";
 
+import { CategorySelect } from "@/components/CategorySelect";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -7,25 +8,36 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 import { TableCell } from "@/components/ui/table";
-import { type TransactionWithFetchedAt } from "@/types/transaction";
+import {
+  type TransactionWithFetchedAt,
+  type UpdateTransactionParams,
+} from "@/types/transaction";
 import { format, parseISO } from "date-fns";
 import { AnimatePresence, motion } from "framer-motion";
-import { MoreHorizontal, Trash } from "lucide-react";
+import { Edit, MoreHorizontal, Save, Trash, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
 interface TransactionRowProps {
   transaction: TransactionWithFetchedAt;
   onDeleteClick: (transactionId: string) => void;
+  onEditTransaction: (
+    transactionId: string,
+    updatedData: UpdateTransactionParams,
+  ) => Promise<void>;
   isDeleting: boolean;
 }
 
 export default function TransactionRow({
   transaction,
   onDeleteClick,
+  onEditTransaction,
   isDeleting,
 }: Readonly<TransactionRowProps>) {
   const [isAnimating, setIsAnimating] = useState(transaction.isNew);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedTransaction, setEditedTransaction] = useState(transaction);
 
   useEffect(() => {
     if (isAnimating) {
@@ -36,7 +48,34 @@ export default function TransactionRow({
     }
   }, [isAnimating]);
 
-  const formattedDate = format(parseISO(transaction.date), "dd/MM/yyyy");
+  const handleEditClick = () => {
+    setIsEditing(true);
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setEditedTransaction(transaction);
+  };
+
+  const handleSaveEdit = async () => {
+    const updatedData: UpdateTransactionParams = {
+      amount: editedTransaction.amount,
+      category_id: editedTransaction.category_id,
+      date: editedTransaction.date,
+      description: editedTransaction.description,
+    };
+    await onEditTransaction(transaction.id, updatedData);
+    setIsEditing(false);
+  };
+
+  const handleInputChange = (
+    field: keyof UpdateTransactionParams,
+    value: string | number,
+  ) => {
+    setEditedTransaction((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const formattedDate = format(parseISO(editedTransaction.date), "dd/MM/yyyy");
 
   return (
     <AnimatePresence>
@@ -47,18 +86,67 @@ export default function TransactionRow({
           exit={{ opacity: 0, y: 0 }}
           transition={{ duration: 0.5, ease: "easeOut" }}
         >
-          <TableCell>{formattedDate}</TableCell>
           <TableCell>
-            {transaction.categories?.name ?? "Uncategorized"}
+            {isEditing ? (
+              <Input
+                type="date"
+                value={editedTransaction.date}
+                onChange={(e) => handleInputChange("date", e.target.value)}
+              />
+            ) : (
+              formattedDate
+            )}
+          </TableCell>
+          <TableCell>
+            {isEditing ? (
+              <CategorySelect
+                value={{
+                  value: editedTransaction.category_id ?? "",
+                  label: editedTransaction.categories?.name ?? "",
+                }}
+                onChange={(newCategory) =>
+                  handleInputChange("category_id", newCategory?.value ?? null)
+                }
+                isDisabled={false}
+              />
+            ) : (
+              (editedTransaction.categories?.name ?? "Uncategorized")
+            )}
           </TableCell>
           <TableCell
             className={
-              transaction.amount < 0 ? "text-red-500" : "text-money-green"
+              editedTransaction.amount < 0 ? "text-red-500" : "text-money-green"
             }
           >
-            ${Math.abs(transaction.amount).toFixed(2)}
+            {isEditing ? (
+              <Input
+                type="number"
+                value={Math.abs(editedTransaction.amount)}
+                onChange={(e) =>
+                  handleInputChange(
+                    "amount",
+                    parseFloat(e.target.value) *
+                      (editedTransaction.amount < 0 ? -1 : 1),
+                  )
+                }
+              />
+            ) : (
+              `$${Math.abs(editedTransaction.amount).toFixed(2)}`
+            )}
           </TableCell>
-          <TableCell>{transaction.description}</TableCell>
+          <TableCell>
+            {isEditing ? (
+              <Input
+                type="text"
+                value={editedTransaction.description ?? ""}
+                onChange={(e) =>
+                  handleInputChange("description", e.target.value)
+                }
+              />
+            ) : (
+              editedTransaction.description
+            )}
+          </TableCell>
           <TableCell>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -68,10 +156,31 @@ export default function TransactionRow({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => onDeleteClick(transaction.id)}>
-                  <Trash className="mr-2 h-4 w-4" />
-                  <span>Delete</span>
-                </DropdownMenuItem>
+                {isEditing ? (
+                  <>
+                    <DropdownMenuItem onClick={handleSaveEdit}>
+                      <Save className="mr-2 h-4 w-4" />
+                      <span>Save</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleCancelEdit}>
+                      <X className="mr-2 h-4 w-4" />
+                      <span>Cancel</span>
+                    </DropdownMenuItem>
+                  </>
+                ) : (
+                  <>
+                    <DropdownMenuItem onClick={handleEditClick}>
+                      <Edit className="mr-2 h-4 w-4" />
+                      <span>Edit</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => onDeleteClick(transaction.id)}
+                    >
+                      <Trash className="mr-2 h-4 w-4" />
+                      <span>Delete</span>
+                    </DropdownMenuItem>
+                  </>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
           </TableCell>

@@ -1,6 +1,6 @@
 import { type ICategoryRepository } from "@/interfaces/ICategoryRepository";
 import { type ITransactionRepository } from "@/interfaces/ITransactionRepository";
-import { type AddTransactionParams, type AddTransactionResult, type DeleteTransactionResult, type GetTransactionsResult } from "@/types/transaction";
+import { type AddTransactionParams, type AddTransactionResult, type DeleteTransactionResult, type EditTransactionResult, type GetTransactionsResult, type UpdateTransactionParams } from "@/types/transaction";
 
 export function createTransactionService(
   transactionRepository: ITransactionRepository,
@@ -45,6 +45,13 @@ export function createTransactionService(
     },
     async deleteTransaction(userId: string, transactionId: string): Promise<DeleteTransactionResult> {
       return await transactionRepository.deleteTransaction(userId, transactionId);
+    },
+    async editTransaction(
+      userId: string,
+      transactionId: string,
+      updatedData: UpdateTransactionParams
+    ): Promise<EditTransactionResult> {
+      return await transactionRepository.editTransaction(userId, transactionId, updatedData);
     },
   };
 }

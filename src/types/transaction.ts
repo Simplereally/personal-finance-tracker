@@ -33,3 +33,16 @@ export interface TransactionWithFetchedAt extends TransactionWithCategory {
   fetchedAt: number;
   isNew?: boolean;
 }
+
+export interface UpdateTransactionParams {
+  amount?: number;
+  category_id?: string | null;
+  date?: string;
+  description?: string | null;
+}
+
+export interface EditTransactionResult {
+  success: boolean;
+  transaction?: TransactionWithCategory;
+  error?: string;
+}

@@ -9,20 +9,29 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { type TransactionWithFetchedAt } from "@/types/transaction";
+import {
+  type TransactionWithFetchedAt,
+  type UpdateTransactionParams,
+} from "@/types/transaction";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 import TransactionRow from "./TransactionRow";
 
 interface TransactionsTableProps {
   transactions: TransactionWithFetchedAt[];
   onDeleteTransaction: (transactionId: string) => Promise<void>;
+  onEditTransaction: (
+    transactionId: string,
+    updatedData: UpdateTransactionParams,
+  ) => Promise<void>;
   isLoading: boolean;
 }
 
 export default function TransactionsTable({
   transactions,
   onDeleteTransaction,
+  onEditTransaction,
   isLoading,
 }: Readonly<TransactionsTableProps>) {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -66,6 +75,19 @@ export default function TransactionsTable({
     }
   };
 
+  const handleEditTransaction = async (
+    transactionId: string,
+    updatedData: UpdateTransactionParams,
+  ) => {
+    try {
+      await onEditTransaction(transactionId, updatedData);
+      toast.success("Transaction updated successfully");
+    } catch (error) {
+      console.error("Failed to update transaction:", error);
+      toast.error("Failed to update transaction");
+    }
+  };
+
   return (
     <>
       <Card className="col-span-full">
@@ -94,6 +116,7 @@ export default function TransactionsTable({
                     key={`${transaction.id}-${transaction.fetchedAt}`}
                     transaction={transaction}
                     onDeleteClick={handleDeleteClick}
+                    onEditTransaction={onEditTransaction}
                     isDeleting={deletingTransactions.has(transaction.id)}
                   />
                 ))}

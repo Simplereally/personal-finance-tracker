@@ -1,5 +1,5 @@
 import { type ITransactionRepository } from "@/interfaces/ITransactionRepository";
-import { type AddTransactionParams, type AddTransactionResult, type DeleteTransactionResult, type GetTransactionsResult } from "@/types/transaction";
+import { type AddTransactionParams, type AddTransactionResult, type DeleteTransactionResult, type EditTransactionResult, type GetTransactionsResult, type TransactionWithCategory, type UpdateTransactionParams } from "@/types/transaction";
 import { createSupabaseTransactionAdapter, type SupabaseTransactionAdapter } from "./adapters/supabaseTransactionAdapter";
 
 export function createTransactionRepository(): ITransactionRepository {
@@ -21,6 +21,18 @@ export function createTransactionRepository(): ITransactionRepository {
       const { error } = await transactionAdapter.deleteTransaction(userId, transactionId);
       if (error) return { success: false, error: error.message };
       return { success: true };
+    },
+    async editTransaction(userId: string, transactionId: string, updatedData: UpdateTransactionParams): Promise<EditTransactionResult> {
+      const { data, error } = await transactionAdapter.editTransaction(userId, transactionId, updatedData);
+      if (error) return { success: false, error: error.message };
+      if (!data) return { success: false, error: "Transaction not found" };
+      
+      const transactionWithCategory: TransactionWithCategory = {
+        ...data,
+        categories: data.categories
+      };
+      
+      return { success: true, transaction: transactionWithCategory };
     },
   };
 }

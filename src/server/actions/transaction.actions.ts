@@ -5,7 +5,7 @@ import { createCategoryRepository } from "@/data-access/CategoryRepository";
 import { createTransactionRepository } from "@/data-access/TransactionRepository";
 import { createAuthService } from "@/services/AuthService";
 import { createTransactionService } from "@/services/TransactionService";
-import { type AddTransactionParams, type AddTransactionResult, type DeleteTransactionResult, type GetTransactionsResult } from "@/types/transaction";
+import { type AddTransactionParams, type AddTransactionResult, type DeleteTransactionResult, type GetTransactionsResult, type UpdateTransactionParams } from "@/types/transaction";
 
 const transactionRepository = createTransactionRepository();
 const categoryRepository = createCategoryRepository();
@@ -39,4 +39,15 @@ export async function deleteTransaction(transactionId: string): Promise<DeleteTr
     return { success: false, error: "User not authenticated" };
   }
   return await transactionService.deleteTransaction(userResult.userid, transactionId);
+}
+
+export async function editTransaction(
+  transactionId: string,
+  updatedData: UpdateTransactionParams
+): Promise<EditTransactionResult> {
+  const userResult = await authService.getUser();
+  if (!userResult.success || !userResult.userid) {
+    return { success: false, error: "User not authenticated" };
+  }
+  return await transactionService.editTransaction(userResult.userid, transactionId, updatedData);
 }

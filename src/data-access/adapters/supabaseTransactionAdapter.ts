@@ -1,5 +1,5 @@
 import { type TransactionData } from "@/types/supabase";
-import { type AddTransactionParams } from "@/types/transaction";
+import { type AddTransactionParams, type UpdateTransactionParams } from "@/types/transaction";
 import { createClient } from "@/utils/supabase/server";
 import { type PostgrestResponse, type PostgrestSingleResponse } from "@supabase/supabase-js";
 
@@ -29,6 +29,18 @@ export function createSupabaseTransactionAdapter() {
         .delete()
         .eq('id', transactionId)
         .eq('user_id', userId);
+    },
+    async editTransaction(userId: string, transactionId: string, updatedData: UpdateTransactionParams): Promise<PostgrestSingleResponse<TransactionData & { categories: { id: string; name: string } | null }>> {
+      return await supabase
+        .from('transactions')
+        .update(updatedData)
+        .eq('id', transactionId)
+        .eq('user_id', userId)
+        .select(`
+          *,
+          categories (id, name)
+        `)
+        .single();
     }
   };
 }

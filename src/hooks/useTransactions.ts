@@ -1,5 +1,5 @@
-import { addTransaction as addTransactionAction, deleteTransaction as deleteTransactionAction, getTransactions } from "@/server/actions/transaction.actions";
-import { type AddTransactionParams, type AddTransactionResult, type DeleteTransactionResult, type GetTransactionsResult, type TransactionWithFetchedAt } from "@/types/transaction";
+import { addTransaction as addTransactionAction, deleteTransaction as deleteTransactionAction, editTransaction as editTransactionAction, getTransactions } from "@/server/actions/transaction.actions";
+import { type AddTransactionParams, type AddTransactionResult, type DeleteTransactionResult, type GetTransactionsResult, type TransactionWithFetchedAt, type UpdateTransactionParams } from "@/types/transaction";
 import { format, startOfDay } from 'date-fns';
 import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
@@ -84,5 +84,22 @@ export function useTransactions() {
     }
   }, []);
 
-  return { transactions, isLoading, fetchTransactions, addTransaction, deleteTransaction };
+  const editTransaction = useCallback(async (
+    transactionId: string,
+    updatedData: UpdateTransactionParams
+  ): Promise<void> => {
+    const result = await editTransactionAction(transactionId, updatedData);
+    if (result.success) {
+      setTransactions(prevTransactions =>
+        prevTransactions.map(t =>
+          t.id === transactionId ? { ...t, ...updatedData, updated_at: new Date().toISOString() } : t
+        )
+      );
+      toast.success("Transaction updated successfully");
+    } else {
+      toast.error(result.error ?? "Failed to update transaction");
+    }
+  }, []);
+
+  return { transactions, isLoading, fetchTransactions, addTransaction, deleteTransaction, editTransaction };
 }
