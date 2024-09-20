@@ -60,7 +60,7 @@ export default function TransactionRow({
 
   const handleSaveEdit = async () => {
     const updatedData: UpdateTransactionParams = {
-      amount: editedTransaction.amount,
+      amount: parseFloat(editedTransaction.amount.toString()),
       category_id: editedTransaction.category_id,
       date: editedTransaction.date,
       description: editedTransaction.description,
@@ -73,9 +73,14 @@ export default function TransactionRow({
     field: keyof UpdateTransactionParams,
     value: string | number,
   ) => {
-    if (/^-?\d*\.?\d*$/.test(value.toString()) || value === "") {
-      console.log(value);
-      setEditedTransaction((prev) => ({ ...prev, [field]: value }));
+    setEditedTransaction((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    // Allow only numbers, decimal point, and minus sign
+    if (/^-?\d*\.?\d*$/.test(value) || value === "") {
+      handleInputChange("amount", value);
     }
   };
 
@@ -89,6 +94,11 @@ export default function TransactionRow({
         ? { id: newCategory.value, name: newCategory.label }
         : null,
     }));
+  };
+
+  const handleDateChange = (newDate: Date) => {
+    const formattedDate = format(newDate, "yyyy-MM-dd");
+    handleInputChange("date", formattedDate);
   };
 
   const formattedDate = format(parseISO(editedTransaction.date), "dd/MM/yyyy");
@@ -106,9 +116,7 @@ export default function TransactionRow({
             {isEditing ? (
               <DatePicker
                 date={parseISO(editedTransaction.date)}
-                onDateChange={(newDate) =>
-                  handleInputChange("date", format(newDate, "yyyy-MM-dd"))
-                }
+                onDateChange={handleDateChange}
               />
             ) : (
               formattedDate
@@ -134,7 +142,9 @@ export default function TransactionRow({
           </TableCell>
           <TableCell
             className={
-              editedTransaction.amount < 0 ? "text-red-500" : "text-money-green"
+              parseFloat(editedTransaction.amount.toString()) < 0
+                ? "text-red-500"
+                : "text-money-green"
             }
           >
             {isEditing ? (
@@ -143,10 +153,10 @@ export default function TransactionRow({
                 inputMode="decimal"
                 placeholder="Amount e.g. 20 or -20"
                 value={editedTransaction.amount}
-                onChange={(e) => handleInputChange("amount", e.target.value)}
+                onChange={handleAmountChange}
               />
             ) : (
-              `$${Math.abs(editedTransaction.amount).toFixed(2)}`
+              `$${Math.abs(parseFloat(editedTransaction.amount.toString())).toFixed(2)}`
             )}
           </TableCell>
           <TableCell>
