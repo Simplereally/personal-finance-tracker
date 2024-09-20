@@ -57,7 +57,7 @@ export default function OverviewCard({
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <p className="text-lg font-medium text-muted-foreground">Income</p>
-            <p className="text-shadow-sm text-money-green text-2xl font-bold">
+            <p className="text-shadow-sm text-2xl font-bold text-green-600">
               +$
               {shouldAnimate ? (
                 <AnimatedCounter decimal={2} amount={income} />

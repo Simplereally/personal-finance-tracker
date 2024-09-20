@@ -7,5 +7,18 @@ export function ThemeProvider({
   children,
   ...props
 }: Readonly<ThemeProviderProps>) {
-  return <NextThemesProvider {...props}>{children}</NextThemesProvider>;
+  return (
+    <NextThemesProvider
+      attribute="class"
+      defaultTheme="light"
+      value={{
+        light: "light",
+        dark: "dark",
+        soft: "soft",
+      }}
+      {...props}
+    >
+      {children}
+    </NextThemesProvider>
+  );
 }

@@ -1,6 +1,7 @@
 import LogoutButton from "@/components/LogoutButton";
+import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 
-export default async function AuthLayout({
+export default function AuthLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -10,11 +11,14 @@ export default async function AuthLayout({
       <header className="border-b border-border bg-secondary">
         <div className="container mx-auto flex items-center justify-between p-4">
           <div className="text-xl font-semibold">
-            <h1 className="inline-block rounded-lg bg-primary px-4 py-2 text-4xl font-bold text-white">
+            <h1 className="inline-block rounded-lg bg-primary px-4 py-2 text-4xl font-bold text-primary-foreground">
               Financial Tracker
             </h1>
           </div>
-          <LogoutButton />
+          <div className="flex items-center gap-4">
+            <ThemeSwitcher />
+            <LogoutButton />
+          </div>
         </div>
       </header>
       <main className="flex-grow bg-background py-8">{children}</main>

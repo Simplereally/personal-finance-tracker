@@ -71,6 +71,14 @@ export default function AddTransactionCard({
     }
   };
 
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    // Allow only numbers, decimal point, and minus sign
+    if (/^-?\d*\.?\d*$/.test(value) || value === "") {
+      setAmount(value);
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -79,10 +87,11 @@ export default function AddTransactionCard({
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input
-            type="number"
-            placeholder="Amount ($)"
+            type="text"
+            inputMode="decimal"
+            placeholder="Amount e.g. 20 or -20"
             value={amount}
-            onChange={(e) => setAmount(e.target.value)}
+            onChange={handleAmountChange}
             required
             disabled={isLoading}
           />

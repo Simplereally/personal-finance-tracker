@@ -113,6 +113,11 @@ const config = {
       textShadow: {
         sm: '0 1px 2px rgba(0, 0, 0, 0.1)',
       },
+      fontSize: {
+        h1: ['2.25rem', { lineHeight: '2.5rem' }], // 36px
+        h2: ['1.875rem', { lineHeight: '2.25rem' }], // 30px
+        // ... other heading sizes
+      },
     },
   },
   plugins: [
