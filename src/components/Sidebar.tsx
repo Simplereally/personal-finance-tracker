@@ -1,18 +1,22 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Modal } from "@/components/ui/Modal";
+import { signOut } from "@/server/actions/auth.actions";
 import { motion } from "framer-motion";
 import {
   ChevronLeft,
   ChevronRight,
   Home,
+  LogOut,
   Menu,
   Settings,
   X,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 
 const sidebarVariants = {
   expanded: { width: "16rem" },
@@ -30,8 +34,10 @@ export function Sidebar({
   onExpandedChange: (expanded: boolean) => void;
 }>) {
   const [isOpen, setIsOpen] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
 
   const toggleExpanded = () => {
     const newExpandedState = !isExpanded;
@@ -39,12 +45,28 @@ export function Sidebar({
     onExpandedChange(newExpandedState);
   };
 
+  const handleLogoutClick = () => {
+    setIsLogoutModalOpen(true);
+  };
+
+  const handleLogoutConfirm = async () => {
+    setIsLogoutModalOpen(false);
+    try {
+      await signOut();
+      toast.success("Logged out successfully");
+      router.push("/login");
+    } catch (error) {
+      console.error("Logout failed:", error);
+      toast.error("Failed to log out. Please try again.");
+    }
+  };
+
   return (
     <>
       <Button
         variant="outline"
         size="icon"
-        className="fixed left-4 top-4 z-50 md:hidden"
+        className="fixed left-6 top-6 z-50 md:hidden"
         onClick={() => setIsOpen(!isOpen)}
       >
         {isOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
@@ -59,7 +81,7 @@ export function Sidebar({
         }}
         transition={{ duration: 0.3 }}
       >
-        <div className="flex h-full flex-col p-4">
+        <div className="flex h-full flex-col p-2">
           <nav className="flex-1">
             <ul className="space-y-2">
               {linkItems.map((item) => (
@@ -84,13 +106,13 @@ export function Sidebar({
       </motion.div>
       <div className="hidden md:block">
         <motion.div
-          className="shadow-sidebar border-sidebar fixed left-0 top-0 z-40 h-full border-r bg-background"
+          className="shadow-sidebar border-sidebar fixed left-0 top-0 z-40 flex h-full flex-col border-r bg-background"
           initial="expanded"
           animate={isExpanded ? "expanded" : "collapsed"}
           variants={sidebarVariants}
           transition={{ duration: 0.3 }}
         >
-          <div className="flex h-full flex-col p-4">
+          <div className="flex flex-1 flex-col p-3">
             <div className="mb-8 flex items-center justify-between">
               <Button
                 variant="ghost"
@@ -117,7 +139,9 @@ export function Sidebar({
                           : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                       }`}
                     >
-                      <item.icon className="h-4 w-4" />
+                      <item.icon
+                        className={isExpanded ? "h-4 w-4" : "h-6 w-6"}
+                      />
                       {isExpanded && <span className="ml-2">{item.label}</span>}
                     </Link>
                   </li>
@@ -125,8 +149,27 @@ export function Sidebar({
               </ul>
             </nav>
           </div>
+          <div className="p-4">
+            <Button
+              variant="ghost"
+              className={`w-full justify-start ${isExpanded ? "px-2" : "px-0"}`}
+              onClick={handleLogoutClick}
+            >
+              <LogOut className={isExpanded ? "h-4 w-4" : "h-6 w-6"} />
+              {isExpanded && <span className="ml-2">Logout</span>}
+            </Button>
+          </div>
         </motion.div>
       </div>
+      <Modal
+        isOpen={isLogoutModalOpen}
+        onClose={() => setIsLogoutModalOpen(false)}
+        onConfirm={handleLogoutConfirm}
+        title="Confirm Logout"
+        description="Are you sure you want to log out?"
+        confirmText="Logout"
+        cancelText="Cancel"
+      />
     </>
   );
 }

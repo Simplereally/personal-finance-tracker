@@ -7,7 +7,7 @@ import { useState } from "react";
 export function AppSidebar({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
+  const [isSidebarExpanded, setIsSidebarExpanded] = useState(false);
 
   return (
     <div className="flex">

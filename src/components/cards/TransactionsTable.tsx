@@ -1,15 +1,6 @@
 "use client";
 
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { Modal } from "@/components/ui/Modal";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -34,7 +25,7 @@ export default function TransactionsTable({
   onDeleteTransaction,
   isLoading,
 }: Readonly<TransactionsTableProps>) {
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [transactionToDelete, setTransactionToDelete] = useState<string | null>(
     null,
   );
@@ -44,13 +35,13 @@ export default function TransactionsTable({
 
   const handleDeleteClick = (transactionId: string) => {
     setTransactionToDelete(transactionId);
-    setIsDeleteDialogOpen(true);
+    setIsDeleteModalOpen(true);
   };
 
   const handleDeleteConfirm = () => {
     if (transactionToDelete) {
       setDeletingTransactions((prev) => new Set(prev).add(transactionToDelete));
-      setIsDeleteDialogOpen(false);
+      setIsDeleteModalOpen(false);
 
       // Wait for the animation to complete before actually deleting
       setTimeout(() => {
@@ -111,29 +102,15 @@ export default function TransactionsTable({
           )}
         </CardContent>
       </Card>
-      <AlertDialog
-        open={isDeleteDialogOpen}
-        onOpenChange={setIsDeleteDialogOpen}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the
-              transaction.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDeleteConfirm}
-              variant="destructive"
-            >
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <Modal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Transaction"
+        description="Are you sure you want to delete this transaction? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+      />
     </>
   );
 }

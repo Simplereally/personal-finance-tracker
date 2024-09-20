@@ -80,6 +80,7 @@ export function CategorySelect({
       isClearable
       options={categories}
       value={value}
+      required
       onChange={handleCategoryChange}
       placeholder="Select or create a category..."
       classNames={{
