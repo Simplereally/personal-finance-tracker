@@ -50,7 +50,7 @@ export function Sidebar({
         {isOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
       </Button>
       <motion.div
-        className="shadow-sidebar border-sidebar fixed left-0 top-0 z-40 h-full w-64 border-r bg-background md:hidden"
+        className="fixed left-0 top-0 z-40 h-full border-r border-[var(--sidebar-border)] bg-background shadow-[var(--sidebar-shadow)] md:hidden"
         initial="closed"
         animate={isOpen ? "open" : "closed"}
         variants={{

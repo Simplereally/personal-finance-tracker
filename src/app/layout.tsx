@@ -1,5 +1,4 @@
 import "@/app/globals.css";
-import { AppSidebar } from "@/components/AppSidebar";
 import DynamicThemeProvider from "@/components/DynamicThemeProvider";
 import { Toaster } from "@/components/ui/sonner";
 import { type Metadata } from "next";
@@ -23,7 +22,7 @@ export default function RootLayout({
     <html lang="en" className={openSans.variable}>
       <body className={openSans.className}>
         <DynamicThemeProvider>
-          <AppSidebar>{children}</AppSidebar>
+          {children}
           <Toaster richColors />
         </DynamicThemeProvider>
       </body>
