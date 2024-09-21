@@ -5,8 +5,7 @@ import OverviewCard from "@/components/cards/OverviewCard";
 import TransactionsTable from "@/components/cards/TransactionsTable";
 import { TransactionFilters } from "@/components/TransactionFilters";
 import { useTransactions } from "@/hooks/useTransactions";
-import { type TransactionWithFetchedAt } from "@/types/transaction";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 export default function DashboardContent() {
   const {
@@ -18,22 +17,17 @@ export default function DashboardContent() {
     editTransaction,
   } = useTransactions();
 
-  const [filteredTransactions, setFilteredTransactions] =
-    useState<TransactionWithFetchedAt[]>(transactions);
+  const [filters, setFilters] = useState<{
+    month: string | null;
+    year: string | null;
+  }>({ month: null, year: null });
 
   useEffect(() => {
     void fetchTransactions();
   }, [fetchTransactions]);
 
-  useEffect(() => {
-    setFilteredTransactions(transactions);
-  }, [transactions]);
-
-  const handleFilterChange = (filters: {
-    month: string | null;
-    year: string | null;
-  }) => {
-    const filtered = transactions.filter((transaction) => {
+  const filteredTransactions = useMemo(() => {
+    return transactions.filter((transaction) => {
       const transactionDate = new Date(transaction.date);
       const monthMatch = filters.month
         ? transactionDate.getMonth() + 1 === parseInt(filters.month)
@@ -43,7 +37,13 @@ export default function DashboardContent() {
         : true;
       return monthMatch && yearMatch;
     });
-    setFilteredTransactions(filtered);
+  }, [transactions, filters]);
+
+  const handleFilterChange = (newFilters: {
+    month: string | null;
+    year: string | null;
+  }) => {
+    setFilters(newFilters);
   };
 
   return (

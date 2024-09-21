@@ -6,7 +6,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const months = [
   "January",
@@ -35,8 +35,16 @@ interface TransactionFiltersProps {
 export function TransactionFilters({
   onFilterChange,
 }: TransactionFiltersProps) {
-  const [month, setMonth] = useState<string | null>(null);
-  const [year, setYear] = useState<string | null>(null);
+  const currentDate = new Date();
+  const currentMonth = (currentDate.getMonth() + 1).toString().padStart(2, "0");
+  const currentYear = currentDate.getFullYear().toString();
+
+  const [month, setMonth] = useState<string | null>(currentMonth);
+  const [year, setYear] = useState<string | null>(currentYear);
+
+  useEffect(() => {
+    onFilterChange({ month, year });
+  }, []); // Run only once on mount
 
   const handleMonthChange = (value: string) => {
     setMonth(value);
