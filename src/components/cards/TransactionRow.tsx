@@ -1,6 +1,7 @@
 "use client";
 
 import { CategorySelect } from "@/components/CategorySelect";
+import { AmountInput } from "@/components/ui/AmountInput";
 import { Button } from "@/components/ui/button";
 import { DatePicker } from "@/components/ui/DatePicker";
 import {
@@ -148,12 +149,9 @@ export default function TransactionRow({
             }
           >
             {isEditing ? (
-              <Input
-                type="text"
-                inputMode="decimal"
-                placeholder="Amount e.g. 20 or -20"
-                value={editedTransaction.amount}
-                onChange={handleAmountChange}
+              <AmountInput
+                value={editedTransaction.amount.toString()}
+                onChange={(value) => handleInputChange("amount", value)}
               />
             ) : (
               `$${Math.abs(parseFloat(editedTransaction.amount.toString())).toFixed(2)}`

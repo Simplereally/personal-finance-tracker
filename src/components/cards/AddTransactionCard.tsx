@@ -1,6 +1,7 @@
 "use client";
 
 import { CategorySelect } from "@/components/CategorySelect";
+import { AmountInput } from "@/components/ui/AmountInput";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DatePicker } from "@/components/ui/DatePicker";
@@ -113,56 +114,11 @@ export default function AddTransactionCard({
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="relative">
-            <Input
-              type="text"
-              inputMode="decimal"
-              placeholder="Amount"
-              value={amount}
-              onChange={handleAmountChange}
-              required
-              disabled={isLoading}
-              className="pl-14"
-            />
-            <button
-              type="button"
-              onClick={toggleTransactionType}
-              className={getToggleButtonClass()}
-              disabled={isLoading}
-            >
-              {isIncome ? (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 6v12M6 12h12"
-                  />
-                </svg>
-              ) : (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 12h12"
-                  />
-                </svg>
-              )}
-            </button>
-          </div>
+          <AmountInput
+            value={amount}
+            onChange={setAmount}
+            disabled={isLoading}
+          />
           <CategorySelect
             value={category}
             onChange={(newValue) => setCategory(newValue)}
