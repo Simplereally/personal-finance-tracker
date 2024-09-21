@@ -31,19 +31,24 @@ export function Modal({
   cancelText,
 }: Readonly<ModalProps>) {
   return (
-    <AlertDialog open={isOpen} onOpenChange={onClose}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>{title}</AlertDialogTitle>
-          <AlertDialogDescription>{description}</AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>{cancelText}</AlertDialogCancel>
-          <AlertDialogAction onClick={onConfirm} variant="destructive">
-            {confirmText}
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+    <div>
+      {isOpen && (
+        <div className="fixed inset-0 z-40 bg-gray-900 bg-opacity-80" />
+      )}
+      <AlertDialog open={isOpen} onOpenChange={onClose}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{title}</AlertDialogTitle>
+            <AlertDialogDescription>{description}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{cancelText}</AlertDialogCancel>
+            <AlertDialogAction onClick={onConfirm} variant="destructive">
+              {confirmText}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
   );
 }
