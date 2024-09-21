@@ -13,7 +13,7 @@ import {
   type TransactionWithFetchedAt,
   type UpdateTransactionParams,
 } from "@/types/transaction";
-import { Loader2 } from "lucide-react";
+import { FileX, Loader2 } from "lucide-react";
 import { useState } from "react";
 import TransactionRow from "./TransactionRow";
 
@@ -87,7 +87,7 @@ export default function TransactionsTable({
             <div className="flex h-32 items-center justify-center">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
-          ) : (
+          ) : transactions.length > 0 ? (
             <Table>
               <TableHeader>
                 <TableRow>
@@ -111,6 +111,11 @@ export default function TransactionsTable({
                 ))}
               </TableBody>
             </Table>
+          ) : (
+            <div className="flex h-32 flex-col items-center justify-center text-muted-foreground">
+              <FileX className="mb-2 h-12 w-12" />
+              <p>No transactions found</p>
+            </div>
           )}
         </CardContent>
       </Card>
