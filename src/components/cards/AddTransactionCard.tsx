@@ -22,10 +22,12 @@ interface AddTransactionCardProps {
     >,
     categoryName?: string,
   ) => Promise<AddTransactionResult>;
+  onTransactionsChange: () => void; // Add this prop
 }
 
 export default function AddTransactionCard({
   addTransaction,
+  onTransactionsChange,
 }: Readonly<AddTransactionCardProps>) {
   const [date, setDate] = useState<Date>(new Date());
   const [amount, setAmount] = useState("");
@@ -98,6 +100,9 @@ export default function AddTransactionCard({
             onChange={(newValue) => setCategory(newValue)}
             isDisabled={isLoading}
             required
+            onTransactionsChange={onTransactionsChange}
+            showDeleteAction
+            allowAdditions // Add this prop to enable adding new categories
           />
           <Input
             type="text"

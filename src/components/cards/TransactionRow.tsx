@@ -128,6 +128,9 @@ export default function TransactionRow({
                 }
                 onChange={handleCategoryChange}
                 isDisabled={false}
+                onTransactionsChange={() => {}} // You might want to implement this
+                showDeleteAction={false}
+                allowAdditions={false} // Disable adding new categories when editing
               />
             ) : (
               (editedTransaction.categories?.name ?? "Uncategorized")

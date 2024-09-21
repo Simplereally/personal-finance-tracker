@@ -24,6 +24,9 @@ interface CategorySelectProps {
   onChange: (category: Category | null) => void;
   isDisabled: boolean;
   required?: boolean;
+  onTransactionsChange: () => void;
+  showDeleteAction?: boolean;
+  allowAdditions?: boolean; // Add this new prop
 }
 
 export function CategorySelect({
@@ -31,6 +34,9 @@ export function CategorySelect({
   onChange,
   isDisabled,
   required = false,
+  onTransactionsChange,
+  showDeleteAction = false,
+  allowAdditions = false, // Add this with a default value of false
 }: Readonly<CategorySelectProps>) {
   const [categories, setCategories] = useState<Category[]>([]);
   const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null);
@@ -58,6 +64,10 @@ export function CategorySelect({
 
   const handleCreateCategory = useCallback(
     async (inputValue: string) => {
+      if (!allowAdditions) {
+        // If additions are not allowed, don't create a new category
+        return;
+      }
       const result = await createCategory(inputValue);
       if (result.success && result.categories.length > 0) {
         const newCategory = {
@@ -70,12 +80,12 @@ export function CategorySelect({
         toast.error(result.error ?? "Failed to create category");
       }
     },
-    [onChange],
+    [onChange, allowAdditions],
   );
 
   const handleCategoryChange = useCallback(
     (newCategory: Category | null, actionMeta: { action: string }) => {
-      if (actionMeta.action === "create-option") {
+      if (actionMeta.action === "create-option" && allowAdditions) {
         void handleCreateCategory(newCategory?.label ?? "");
       } else if (actionMeta.action === "clear") {
         onChange(null);
@@ -83,7 +93,7 @@ export function CategorySelect({
         onChange(newCategory);
       }
     },
-    [onChange, handleCreateCategory],
+    [onChange, handleCreateCategory, allowAdditions],
   );
 
   const handleDeleteClick = (categoryId: string, event: React.MouseEvent) => {
@@ -104,20 +114,18 @@ export function CategorySelect({
             onChange(null);
           }
           toast.success("Category deleted successfully");
-        } else {
-          if (result.error === "TRANSACTIONS_EXIST") {
-            toast.error(
-              "Unable to delete category - transactions exist for this category.",
-              {
-                action: {
-                  label: "Delete transactions",
-                  onClick: () => setIsDeleteTransactionsModalOpen(true),
-                },
+        } else if (result.error === "TRANSACTIONS_EXIST") {
+          toast.error(
+            "Unable to delete category - transactions exist for this category.",
+            {
+              action: {
+                label: "Delete transactions",
+                onClick: () => setIsDeleteTransactionsModalOpen(true),
               },
-            );
-          } else {
-            toast.error(result.error ?? "Failed to delete category");
-          }
+            },
+          );
+        } else {
+          toast.error(result.error ?? "Failed to delete category");
         }
       } catch (error) {
         console.error("Error deleting category:", error);
@@ -141,6 +149,7 @@ export function CategorySelect({
           toast.success(
             "Category and associated transactions deleted successfully",
           );
+          onTransactionsChange(); // This should now work correctly
         } else {
           toast.error(
             result.error ?? "Failed to delete category and transactions",
@@ -167,10 +176,12 @@ export function CategorySelect({
       className="flex items-center justify-between px-3 py-2 hover:bg-accent"
     >
       <span>{label}</span>
-      <X
-        className="h-4 w-4 cursor-pointer text-muted-foreground hover:text-foreground"
-        onClick={(e) => handleDeleteClick(data.value, e)}
-      />
+      {showDeleteAction && ( // Only render the delete button if showDeleteAction is true
+        <X
+          className="h-4 w-4 cursor-pointer text-muted-foreground hover:text-foreground"
+          onClick={(e) => handleDeleteClick(data.value, e)}
+        />
+      )}
     </div>
   );
 
@@ -202,6 +213,9 @@ export function CategorySelect({
           Option: customOption,
         }}
         unstyled
+        isValidNewOption={(inputValue) =>
+          allowAdditions && inputValue.length > 0
+        }
       />
       <Modal
         isOpen={isDeleteModalOpen}

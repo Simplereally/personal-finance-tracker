@@ -24,7 +24,10 @@ export default function DashboardContent() {
     <>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <div className="col-span-1 md:col-span-2 lg:col-span-1">
-          <AddTransactionCard addTransaction={addTransaction} />
+          <AddTransactionCard
+            addTransaction={addTransaction}
+            onTransactionsChange={fetchTransactions} // Add this prop
+          />
         </div>
         <div className="col-span-1 md:col-span-2 lg:col-span-2">
           <OverviewCard transactions={transactions} isLoading={isLoading} />

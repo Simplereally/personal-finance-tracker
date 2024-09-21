@@ -37,6 +37,11 @@ export function useTransactions() {
         isNew: false
       }));
       setTransactions(sortTransactions(standardizedTransactions));
+    } else {
+      // Handle error case
+      console.error("Failed to fetch transactions:", result.error);
+      // Optionally set transactions to an empty array or keep the previous state
+      // setTransactions([]);
     }
     setIsLoading(false);
   }, []);
