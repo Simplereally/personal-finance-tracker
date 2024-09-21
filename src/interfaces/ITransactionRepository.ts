@@ -5,4 +5,5 @@ export interface ITransactionRepository {
   getTransactions(userId: string): Promise<GetTransactionsResult>;
   deleteTransaction(userId: string, transactionId: string): Promise<DeleteTransactionResult>;
   editTransaction(userId: string, transactionId: string, updatedData: UpdateTransactionParams): Promise<EditTransactionResult>;
+  deleteTransactionsByCategory(userId: string, categoryId: string): Promise<void>;
 }

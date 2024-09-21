@@ -34,5 +34,9 @@ export function createTransactionRepository(): ITransactionRepository {
       
       return { success: true, transaction: transactionWithCategory };
     },
+    async deleteTransactionsByCategory(userId: string, categoryId: string): Promise<void> {
+      const { error } = await transactionAdapter.deleteTransactionsByCategory(userId, categoryId);
+      if (error) throw new Error(error.message);
+    },
   };
 }

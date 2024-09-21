@@ -5,3 +5,12 @@ export interface GetCategoriesResult {
   categories: CategoryData[];
   error?: string;
 }
+
+export interface DeleteCategoryResult {
+  success: boolean;
+  error?: string;
+}
+
+export interface DeleteCategoryError extends Error {
+  code: 'TRANSACTIONS_EXIST' | 'NOT_FOUND' | 'UNKNOWN';
+}

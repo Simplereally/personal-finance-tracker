@@ -53,6 +53,9 @@ export function createTransactionService(
     ): Promise<EditTransactionResult> {
       return await transactionRepository.editTransaction(userId, transactionId, updatedData);
     },
+    async deleteTransactionsByCategory(userId: string, categoryId: string): Promise<void> {
+      await transactionRepository.deleteTransactionsByCategory(userId, categoryId);
+    },
   };
 }
 
