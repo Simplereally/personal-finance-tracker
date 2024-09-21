@@ -25,6 +25,7 @@ interface TransactionsTableProps {
     updatedData: UpdateTransactionParams,
   ) => Promise<void>;
   isLoading: boolean;
+  onTransactionsChange: () => void;
 }
 
 export default function TransactionsTable({
@@ -32,6 +33,7 @@ export default function TransactionsTable({
   onDeleteTransaction,
   onEditTransaction,
   isLoading,
+  onTransactionsChange,
 }: Readonly<TransactionsTableProps>) {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [transactionToDelete, setTransactionToDelete] = useState<string | null>(
@@ -103,6 +105,7 @@ export default function TransactionsTable({
                     transaction={transaction}
                     onDeleteClick={handleDeleteClick}
                     onEditTransaction={onEditTransaction}
+                    onTransactionsChange={onTransactionsChange}
                     isDeleting={deletingTransactions.has(transaction.id)}
                   />
                 ))}

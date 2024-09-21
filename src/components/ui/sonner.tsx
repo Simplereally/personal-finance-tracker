@@ -13,6 +13,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
       theme={theme === "dark" ? "dark" : "light"}
       className="toaster group"
       toastOptions={{
+        duration: 3000, // Default duration for all toasts (3 seconds)
         classNames: {
           toast:
             "group toast group-[.toaster]:bg-background group-[.toaster]:text-foreground group-[.toaster]:border-border group-[.toaster]:shadow-lg",

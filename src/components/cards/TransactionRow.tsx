@@ -29,6 +29,7 @@ interface TransactionRowProps {
   ) => Promise<void>;
   onDeleteClick: (transactionId: string) => void;
   isDeleting: boolean;
+  onTransactionsChange: () => void;
 }
 
 export default function TransactionRow({
@@ -36,6 +37,7 @@ export default function TransactionRow({
   onEditTransaction,
   onDeleteClick,
   isDeleting,
+  onTransactionsChange,
 }: Readonly<TransactionRowProps>) {
   const [isAnimating, setIsAnimating] = useState(transaction.isNew);
   const [isEditing, setIsEditing] = useState(false);
@@ -128,7 +130,7 @@ export default function TransactionRow({
                 }
                 onChange={handleCategoryChange}
                 isDisabled={false}
-                onTransactionsChange={() => {}} // You might want to implement this
+                onTransactionsChange={onTransactionsChange}
                 showDeleteAction={false}
                 allowAdditions={false} // Disable adding new categories when editing
               />

@@ -10,7 +10,6 @@ import { type TransactionData } from "@/types/supabase";
 import { type AddTransactionResult } from "@/types/transaction";
 import { format } from "date-fns";
 import { Loader2 } from "lucide-react";
-import { useTheme } from "next-themes";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -37,8 +36,6 @@ export default function AddTransactionCard({
   } | null>(null);
   const [description, setDescription] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [isIncome, setIsIncome] = useState(true);
-  const { theme } = useTheme();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

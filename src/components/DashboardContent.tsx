@@ -38,6 +38,7 @@ export default function DashboardContent() {
           transactions={transactions}
           onDeleteTransaction={deleteTransaction}
           onEditTransaction={editTransaction}
+          onTransactionsChange={fetchTransactions}
           isLoading={isLoading}
         />
       </div>

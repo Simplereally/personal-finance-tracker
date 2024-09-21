@@ -118,6 +118,7 @@ export function CategorySelect({
           toast.error(
             "Unable to delete category - transactions exist for this category.",
             {
+              duration: 5000, // 5 seconds
               action: {
                 label: "Delete transactions",
                 onClick: () => setIsDeleteTransactionsModalOpen(true),
@@ -194,7 +195,7 @@ export function CategorySelect({
         options={categories}
         value={value}
         onChange={handleCategoryChange}
-        placeholder="Select or create a category..."
+        placeholder="Select or type a category..."
         classNames={{
           control: (state) =>
             cn(
