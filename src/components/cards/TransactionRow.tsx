@@ -23,18 +23,18 @@ import { useEffect, useState } from "react";
 
 interface TransactionRowProps {
   transaction: TransactionWithFetchedAt;
-  onDeleteClick: (transactionId: string) => void;
   onEditTransaction: (
     transactionId: string,
     updatedData: UpdateTransactionParams,
   ) => Promise<void>;
+  onDeleteClick: (transactionId: string) => void;
   isDeleting: boolean;
 }
 
 export default function TransactionRow({
   transaction,
-  onDeleteClick,
   onEditTransaction,
+  onDeleteClick,
   isDeleting,
 }: Readonly<TransactionRowProps>) {
   const [isAnimating, setIsAnimating] = useState(transaction.isNew);
@@ -75,14 +75,6 @@ export default function TransactionRow({
     value: string | number,
   ) => {
     setEditedTransaction((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    // Allow only numbers, decimal point, and minus sign
-    if (/^-?\d*\.?\d*$/.test(value) || value === "") {
-      handleInputChange("amount", value);
-    }
   };
 
   const handleCategoryChange = (
@@ -154,7 +146,7 @@ export default function TransactionRow({
                 onChange={(value) => handleInputChange("amount", value)}
               />
             ) : (
-              `$${Math.abs(parseFloat(editedTransaction.amount.toString())).toFixed(2)}`
+              `${parseFloat(editedTransaction.amount.toString()) < 0 ? "-" : ""}$${Math.abs(parseFloat(editedTransaction.amount.toString())).toFixed(2)}`
             )}
           </TableCell>
           <TableCell>
@@ -171,41 +163,48 @@ export default function TransactionRow({
             )}
           </TableCell>
           <TableCell>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-8 w-8 p-0">
-                  <span className="sr-only">Open menu</span>
-                  <MoreHorizontal className="h-4 w-4" />
+            {isEditing ? (
+              <div className="flex space-x-2">
+                <Button
+                  onClick={handleSaveEdit}
+                  size="sm"
+                  className="px-2 py-1"
+                >
+                  <Save className="mr-1 h-4 w-4" />
+                  Save
                 </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                {isEditing ? (
-                  <>
-                    <DropdownMenuItem onClick={handleSaveEdit}>
-                      <Save className="mr-2 h-4 w-4" />
-                      <span>Save</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={handleCancelEdit}>
-                      <X className="mr-2 h-4 w-4" />
-                      <span>Cancel</span>
-                    </DropdownMenuItem>
-                  </>
-                ) : (
-                  <>
-                    <DropdownMenuItem onClick={handleEditClick}>
-                      <Edit className="mr-2 h-4 w-4" />
-                      <span>Edit</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => onDeleteClick(transaction.id)}
-                    >
-                      <Trash className="mr-2 h-4 w-4" />
-                      <span>Delete</span>
-                    </DropdownMenuItem>
-                  </>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
+                <Button
+                  onClick={handleCancelEdit}
+                  variant="outline"
+                  size="sm"
+                  className="px-2 py-1"
+                >
+                  <X className="mr-1 h-4 w-4" />
+                  Cancel
+                </Button>
+              </div>
+            ) : (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="h-8 w-8 p-0">
+                    <span className="sr-only">Open menu</span>
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={handleEditClick}>
+                    <Edit className="mr-2 h-4 w-4" />
+                    <span>Edit</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => onDeleteClick(transaction.id)}
+                  >
+                    <Trash className="mr-2 h-4 w-4" />
+                    <span>Delete</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </TableCell>
         </motion.tr>
       )}

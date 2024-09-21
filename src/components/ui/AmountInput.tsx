@@ -2,13 +2,14 @@
 
 import { Input } from "@/components/ui/input";
 import { useTheme } from "next-themes";
-import React from "react";
+import React, { useEffect } from "react";
 
 interface AmountInputProps {
   value: string;
   onChange: (value: string) => void;
   disabled?: boolean;
   className?: string;
+  required?: boolean;
 }
 
 export function AmountInput({
@@ -16,15 +17,24 @@ export function AmountInput({
   onChange,
   disabled = false,
   className = "",
-}: AmountInputProps) {
-  const [isIncome, setIsIncome] = React.useState(true);
+  required = false,
+}: Readonly<AmountInputProps>) {
+  const [isIncome, setIsIncome] = React.useState(false);
   const { theme } = useTheme();
+
+  useEffect(() => {
+    // Initialize isIncome based on the value prop
+    if (value !== "") {
+      setIsIncome(parseFloat(value) >= 0);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty dependency array ensures this runs only on mount
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     // Allow only numbers and decimal point
     if (/^\d*\.?\d*$/.test(newValue) || newValue === "") {
-      onChange(newValue);
+      onChange(isIncome ? newValue : `-${newValue}`);
     }
   };
 
@@ -58,6 +68,7 @@ export function AmountInput({
         onChange={handleAmountChange}
         disabled={disabled}
         className={`pl-10 ${className}`}
+        required={required}
       />
       <button
         type="button"

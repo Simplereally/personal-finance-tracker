@@ -49,8 +49,8 @@ export default function AddTransactionCard({
       return;
     }
 
-    // Apply negative sign for expenses
-    const finalAmount = isIncome ? parsedAmount : -parsedAmount;
+    // Use parsedAmount directly, as it now includes the correct sign
+    const finalAmount = parsedAmount;
 
     const transactionData: Omit<
       TransactionData,
@@ -80,33 +80,6 @@ export default function AddTransactionCard({
     }
   };
 
-  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    // Allow only numbers and decimal point
-    if (/^\d*\.?\d*$/.test(value) || value === "") {
-      setAmount(value);
-    }
-  };
-
-  const toggleTransactionType = () => {
-    setIsIncome(!isIncome);
-  };
-
-  const getToggleButtonClass = () => {
-    const baseClass =
-      "absolute bottom-0 left-0 top-0 flex w-8 items-center justify-center rounded-l-md border-r";
-    const incomeClass =
-      theme === "dark"
-        ? "bg-green-900 text-green-300"
-        : "bg-[hsl(var(--toaster-success))] text-white";
-    const expenseClass =
-      theme === "dark"
-        ? "bg-red-900 text-red-300"
-        : "bg-[hsl(var(--toaster-error))] text-white";
-
-    return `${baseClass} ${isIncome ? incomeClass : expenseClass}`;
-  };
-
   return (
     <Card>
       <CardHeader>
@@ -118,11 +91,13 @@ export default function AddTransactionCard({
             value={amount}
             onChange={setAmount}
             disabled={isLoading}
+            required
           />
           <CategorySelect
             value={category}
             onChange={(newValue) => setCategory(newValue)}
             isDisabled={isLoading}
+            required
           />
           <Input
             type="text"
