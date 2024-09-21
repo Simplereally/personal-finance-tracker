@@ -1,7 +1,7 @@
 import AnimatedCounter from "@/components/AnimatedCounter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { type TransactionWithFetchedAt } from "@/types/transaction";
-import { Loader2 } from "lucide-react";
+import { ArrowDownIcon, ArrowUpIcon, Loader2, ScaleIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
 interface OverviewCardProps {
@@ -40,7 +40,7 @@ export default function OverviewCard({
     return (
       <Card className="col-span-full md:col-span-1">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold">Overview</CardTitle>
+          <CardTitle className="text-xl font-semibold">Overview</CardTitle>
         </CardHeader>
         <CardContent className="flex h-40 items-center justify-center">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -49,17 +49,22 @@ export default function OverviewCard({
     );
   }
 
+  const balanceColor = balance >= 0 ? "green" : "red";
+
   return (
     <Card className="col-span-full md:col-span-1">
       <CardHeader>
-        <CardTitle className="text-2xl font-bold">Overview</CardTitle>
+        <CardTitle className="text-xl font-semibold">Overview</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-6">
         <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <p className="text-lg font-medium text-muted-foreground">Income</p>
-            <p className="text-2xl font-bold text-green-500 text-shadow-sm">
-              +$
+          <div className="space-y-2 rounded-lg bg-green-50 p-3 dark:bg-green-900/20">
+            <div className="flex items-center space-x-2">
+              <ArrowUpIcon className="h-5 w-5 text-green-600" />
+              <p className="text-sm font-medium">Income</p>
+            </div>
+            <p className="text-lg font-semibold text-green-600">
+              $
               {shouldAnimate ? (
                 <AnimatedCounter decimal={2} amount={income} />
               ) : (
@@ -67,10 +72,13 @@ export default function OverviewCard({
               )}
             </p>
           </div>
-          <div className="space-y-2">
-            <p className="text-lg font-medium text-muted-foreground">Expense</p>
-            <p className="text-2xl font-bold text-red-500 text-shadow-sm">
-              -$
+          <div className="space-y-2 rounded-lg bg-red-50 p-3 dark:bg-red-900/20">
+            <div className="flex items-center space-x-2">
+              <ArrowDownIcon className="h-5 w-5 text-red-600" />
+              <p className="text-sm font-medium">Expense</p>
+            </div>
+            <p className="text-lg font-semibold text-red-600">
+              $
               {shouldAnimate ? (
                 <AnimatedCounter decimal={2} amount={expense} />
               ) : (
@@ -79,22 +87,21 @@ export default function OverviewCard({
             </p>
           </div>
         </div>
-        <div className="border-t pt-4">
-          <div className="space-y-2">
-            <p className="text-lg font-medium text-muted-foreground">Balance</p>
-            <p
-              className={`text-3xl font-bold text-shadow-sm ${
-                balance >= 0 ? "text-green-500" : "text-red-500"
-              }`}
-            >
-              {balance >= 0 ? "+" : "-"}$
-              {shouldAnimate ? (
-                <AnimatedCounter decimal={2} amount={Math.abs(balance)} />
-              ) : (
-                Math.abs(balance).toFixed(2)
-              )}
-            </p>
+        <div
+          className={`space-y-2 rounded-lg bg-${balanceColor}-50 p-3 dark:bg-${balanceColor}-900/20`}
+        >
+          <div className="flex items-center space-x-2">
+            <ScaleIcon className={`h-5 w-5 text-${balanceColor}-600`} />
+            <p className="text-sm font-medium">Balance</p>
           </div>
+          <p className={`text-xl font-semibold text-${balanceColor}-600`}>
+            {balance >= 0 ? "+" : "-"}$
+            {shouldAnimate ? (
+              <AnimatedCounter decimal={2} amount={Math.abs(balance)} />
+            ) : (
+              Math.abs(balance).toFixed(2)
+            )}
+          </p>
         </div>
       </CardContent>
     </Card>
