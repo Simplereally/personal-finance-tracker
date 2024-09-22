@@ -36,7 +36,7 @@ export function MobileSidebar({ onLogoutClick }: Readonly<MobileSidebarProps>) {
         animate={isOpen ? "open" : "closed"}
         variants={{
           open: { x: 0 },
-          closed: { x: "-100%" },
+          closed: { x: "100%" },
         }}
         transition={{ duration: 0.3 }}
       >
