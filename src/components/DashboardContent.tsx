@@ -57,6 +57,7 @@ export default function DashboardContent() {
         </div>
         <div className="col-span-1">
           <OverviewCard
+            filters={filters}
             transactions={filteredTransactions}
             isLoading={isLoading}
           />

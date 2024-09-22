@@ -23,7 +23,7 @@ const months = [
   "December",
 ];
 
-const years = Array.from({ length: 27 }, (_, i) => 2024 + i);
+const years = Array.from({ length: 3 }, (_, i) => 2024 + i);
 
 interface TransactionFiltersProps {
   onFilterChange: (filters: {
@@ -34,7 +34,7 @@ interface TransactionFiltersProps {
 
 export function TransactionFilters({
   onFilterChange,
-}: TransactionFiltersProps) {
+}: Readonly<TransactionFiltersProps>) {
   const currentDate = new Date();
   const currentMonth = (currentDate.getMonth() + 1).toString().padStart(2, "0");
   const currentYear = currentDate.getFullYear().toString();

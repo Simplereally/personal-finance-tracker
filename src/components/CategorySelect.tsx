@@ -26,7 +26,7 @@ interface CategorySelectProps {
   required?: boolean;
   onTransactionsChange: () => void;
   showDeleteAction?: boolean;
-  allowAdditions?: boolean; // Add this new prop
+  allowAdditions?: boolean;
 }
 
 export function CategorySelect({
@@ -36,7 +36,7 @@ export function CategorySelect({
   required = false,
   onTransactionsChange,
   showDeleteAction = false,
-  allowAdditions = false, // Add this with a default value of false
+  allowAdditions = false,
 }: Readonly<CategorySelectProps>) {
   const [categories, setCategories] = useState<Category[]>([]);
   const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null);
@@ -64,10 +64,13 @@ export function CategorySelect({
 
   const handleCreateCategory = useCallback(
     async (inputValue: string) => {
-      if (!allowAdditions) {
-        // If additions are not allowed, don't create a new category
+      if (
+        !allowAdditions ||
+        categories.find((cat) => cat.label === inputValue)
+      ) {
         return;
       }
+      toast.message("Creating category...");
       const result = await createCategory(inputValue);
       if (result.success && result.categories.length > 0) {
         const newCategory = {
@@ -76,11 +79,12 @@ export function CategorySelect({
         };
         setCategories((prev) => [...prev, newCategory]);
         onChange(newCategory);
+        toast.success(`Category ${inputValue} has been created.`);
       } else {
         toast.error(result.error ?? "Failed to create category");
       }
     },
-    [onChange, allowAdditions],
+    [allowAdditions, categories, onChange],
   );
 
   const handleCategoryChange = useCallback(
@@ -104,6 +108,7 @@ export function CategorySelect({
 
   const handleDeleteConfirm = async () => {
     if (categoryToDelete) {
+      toast.message("Deleting category...");
       try {
         const result = await deleteCategory(categoryToDelete);
         if (result.success) {
@@ -113,20 +118,17 @@ export function CategorySelect({
           if (value?.value === categoryToDelete) {
             onChange(null);
           }
-          toast.success("Category deleted successfully");
+          toast.success(`Category ${categoryToDelete} has been deleted.`);
         } else if (result.error === "TRANSACTIONS_EXIST") {
-          toast.error(
-            "Unable to delete category - transactions exist for this category.",
-            {
-              duration: 5000, // 5 seconds
-              action: {
-                label: "Delete transactions",
-                onClick: () => setIsDeleteTransactionsModalOpen(true),
-              },
+          toast.error("Transactions are using this category.", {
+            duration: 5000,
+            action: {
+              label: "Delete transactions",
+              onClick: () => setIsDeleteTransactionsModalOpen(true),
             },
-          );
+          });
         } else {
-          toast.error(result.error ?? "Failed to delete category");
+          toast.error("Failed to delete category");
         }
       } catch (error) {
         console.error("Error deleting category:", error);

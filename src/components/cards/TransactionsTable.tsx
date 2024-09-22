@@ -80,7 +80,7 @@ export default function TransactionsTable({
     <div className="w-full overflow-auto">
       <Card className="col-span-full">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold">Transactions</CardTitle>
+          <CardTitle className="text-xl font-semibold">Transactions</CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? (

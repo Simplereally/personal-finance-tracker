@@ -5,11 +5,16 @@ import { ArrowDownIcon, ArrowUpIcon, Loader2, ScaleIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
 interface OverviewCardProps {
+  filters: {
+    month: string | null;
+    year: string | null;
+  };
   transactions: TransactionWithFetchedAt[];
   isLoading: boolean;
 }
 
 export default function OverviewCard({
+  filters,
   transactions,
   isLoading,
 }: Readonly<OverviewCardProps>) {
@@ -40,7 +45,9 @@ export default function OverviewCard({
     return (
       <Card className="col-span-full md:col-span-1">
         <CardHeader>
-          <CardTitle className="text-xl font-semibold">Overview</CardTitle>
+          <CardTitle className="text-xl font-semibold">
+            Overview for {filters.month}/{filters.year}
+          </CardTitle>
         </CardHeader>
         <CardContent className="flex h-40 items-center justify-center">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -54,7 +61,12 @@ export default function OverviewCard({
   return (
     <Card className="col-span-full md:col-span-1">
       <CardHeader>
-        <CardTitle className="text-xl font-semibold">Overview</CardTitle>
+        <CardTitle className="text-xl font-semibold">
+          Overview for{" "}
+          {filters.month || filters.year
+            ? `${filters.month ?? ""} ${filters.year ?? ""}`
+            : "All Time"}
+        </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="grid grid-cols-2 gap-4">
