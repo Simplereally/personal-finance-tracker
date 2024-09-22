@@ -11,11 +11,10 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
 
 const sidebarVariants = {
   expanded: { width: "16rem" },
-  collapsed: { width: "4rem" },
+  collapsed: { width: "3rem" },
 };
 
 const linkItems = [
@@ -24,21 +23,20 @@ const linkItems = [
 ];
 
 interface DesktopSidebarProps {
+  isExpanded: boolean;
   onExpandedChange: (expanded: boolean) => void;
   onLogoutClick: () => void;
 }
 
 export function DesktopSidebar({
+  isExpanded,
   onExpandedChange,
   onLogoutClick,
 }: Readonly<DesktopSidebarProps>) {
-  const [isExpanded, setIsExpanded] = useState(false);
   const pathname = usePathname();
 
   const toggleExpanded = () => {
-    const newExpandedState = !isExpanded;
-    setIsExpanded(newExpandedState);
-    onExpandedChange(newExpandedState);
+    onExpandedChange(!isExpanded);
   };
 
   return (
@@ -50,7 +48,7 @@ export function DesktopSidebar({
         variants={sidebarVariants}
         transition={{ duration: 0.3 }}
       >
-        <div className="flex flex-1 flex-col p-3">
+        <div className="flex flex-1 flex-col p-1">
           <div className="mb-8 flex items-center justify-between">
             <Button
               variant="ghost"
@@ -85,7 +83,7 @@ export function DesktopSidebar({
             </ul>
           </nav>
         </div>
-        <div className="p-4">
+        <div className="p-3">
           <Button
             variant="ghost"
             className={`w-full justify-start ${isExpanded ? "px-2" : "px-0"}`}

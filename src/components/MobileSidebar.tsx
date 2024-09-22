@@ -2,18 +2,21 @@
 
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { Home, Menu, Settings, X } from "lucide-react";
+import { Home, LogOut, Menu, Settings, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import LogoutButton from "./LogoutButton";
 
 const linkItems = [
   { href: "/", label: "Home", icon: Home },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 
-export function MobileSidebar() {
+interface MobileSidebarProps {
+  onLogoutClick: () => void;
+}
+
+export function MobileSidebar({ onLogoutClick }: Readonly<MobileSidebarProps>) {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
 
@@ -59,7 +62,14 @@ export function MobileSidebar() {
             </ul>
           </nav>
           <div className="border-t p-4">
-            <LogoutButton />
+            <Button
+              variant="secondary"
+              className={`w-full`}
+              onClick={onLogoutClick}
+            >
+              <LogOut className={"h-4 w-4"} />
+              <span className="ml-2">Logout</span>
+            </Button>
           </div>
         </div>
       </motion.div>

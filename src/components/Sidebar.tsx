@@ -8,11 +8,15 @@ import { toast } from "sonner";
 import { DesktopSidebar } from "./DesktopSidebar";
 import { MobileSidebar } from "./MobileSidebar";
 
-export function Sidebar({
-  onExpandedChange,
-}: Readonly<{
+interface SidebarProps {
+  isExpanded: boolean;
   onExpandedChange: (expanded: boolean) => void;
-}>) {
+}
+
+export function Sidebar({
+  isExpanded,
+  onExpandedChange,
+}: Readonly<SidebarProps>) {
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const router = useRouter();
 
@@ -34,8 +38,9 @@ export function Sidebar({
 
   return (
     <>
-      <MobileSidebar />
+      <MobileSidebar onLogoutClick={handleLogoutClick} />
       <DesktopSidebar
+        isExpanded={isExpanded}
         onExpandedChange={onExpandedChange}
         onLogoutClick={handleLogoutClick}
       />

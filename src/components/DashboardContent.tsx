@@ -48,14 +48,14 @@ export default function DashboardContent() {
 
   return (
     <>
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <div className="col-span-1 md:col-span-2 lg:col-span-1">
+      <div className="grid gap-6 md:grid-cols-2">
+        <div className="col-span-1">
           <AddTransactionCard
             addTransaction={addTransaction}
             onTransactionsChange={fetchTransactions}
           />
         </div>
-        <div className="col-span-1 md:col-span-2 lg:col-span-2">
+        <div className="col-span-1">
           <OverviewCard
             transactions={filteredTransactions}
             isLoading={isLoading}
