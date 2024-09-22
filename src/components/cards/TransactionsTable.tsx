@@ -77,7 +77,7 @@ export default function TransactionsTable({
   };
 
   return (
-    <>
+    <div className="w-full overflow-auto">
       <Card className="col-span-full">
         <CardHeader>
           <CardTitle className="text-2xl font-bold">Transactions</CardTitle>
@@ -128,6 +128,6 @@ export default function TransactionsTable({
         confirmText="Delete"
         cancelText="Cancel"
       />
-    </>
+    </div>
   );
 }
