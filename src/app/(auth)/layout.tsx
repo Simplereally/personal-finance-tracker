@@ -9,7 +9,7 @@ export default function AuthLayout({
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
       <header>
-        <div className="mx-auto flex items-center justify-end">
+        <div className="flex justify-end px-14">
           <div className="mt-2 flex items-center gap-4">
             <ThemeSwitcher />
           </div>

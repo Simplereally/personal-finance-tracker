@@ -25,7 +25,7 @@ export function MobileSidebar({ onLogoutClick }: Readonly<MobileSidebarProps>) {
       <Button
         variant="outline"
         size="icon"
-        className="fixed right-4 top-4 z-50 h-10 w-10 md:hidden"
+        className="fixed right-2 top-2 z-50 h-10 w-10 md:hidden"
         onClick={() => setIsOpen(!isOpen)}
       >
         {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -41,7 +41,7 @@ export function MobileSidebar({ onLogoutClick }: Readonly<MobileSidebarProps>) {
         transition={{ duration: 0.3 }}
       >
         <div className="flex h-full flex-col">
-          <nav className="flex-grow overflow-y-auto p-4">
+          <nav className="flex-grow overflow-y-auto p-4 pt-14">
             <ul className="space-y-2">
               {linkItems.map((item) => (
                 <li key={item.href}>
