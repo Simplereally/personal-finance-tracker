@@ -252,7 +252,7 @@ export function SpendingChart({
       <CardHeader>
         <CardTitle>Spending over time</CardTitle>
         <span className="text-xs text-[#79656c]">
-          {limit ? "Against your limit" : "Cumulative"}
+          {limit ? `${money(limit, currency, true)} limit` : "Cumulative"}
         </span>
       </CardHeader>
       <CardContent>
@@ -351,15 +351,6 @@ export function SpendingChart({
                     stroke="#b3b49e"
                     stroke-dasharray="6 5"
                   />
-                  <text
-                    x={width - 3}
-                    y={y(limit) - 7}
-                    text-anchor="end"
-                    fill="#777c68"
-                    font-size="11"
-                  >
-                    {money(limit, currency, true)} limit
-                  </text>
                 </>
               )}
               <polygon

@@ -407,7 +407,7 @@ export function Workspace({
           </Card>
         )}
         {isOverview && !emptyMonth && (
-          <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-[1.5fr_1fr]">
+          <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[1.5fr_1fr]">
             <SpendingChart
               summary={summary}
               currency={profile.currency}
@@ -424,7 +424,7 @@ export function Workspace({
           </div>
         )}
         {isOverview && !emptyMonth && (
-          <div className="mt-6 grid grid-cols-1 items-start gap-6 xl:grid-cols-[1.5fr_1fr]">
+          <div className="mt-6 grid grid-cols-1 items-start gap-6 lg:grid-cols-[1.5fr_1fr]">
             <TransactionList
               customCategories={customCategories.map((c) => c.name)}
               transactions={transactions}
