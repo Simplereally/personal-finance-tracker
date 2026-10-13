@@ -146,6 +146,14 @@ export function Preview() {
       ),
     deleteGoal: async (id) =>
       setGoals((rows) => rows.filter((r) => r.id !== id)),
+    addToGoal: async (id, amount) =>
+      setGoals((rows) =>
+        rows.map((row) =>
+          row.id === id ? { ...row, saved: row.saved + amount } : row,
+        ),
+      ),
+    saveMonthlyBudget: async (amount) =>
+      setProfile((p) => ({ ...p, monthlyBudget: amount })),
     saveBudget: async (category, amount) =>
       setBudgets((rows) => [
         ...rows.filter((r) => r.category !== category),

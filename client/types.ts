@@ -4,6 +4,8 @@ export type Actions = {
   deleteTransaction: (id: string) => Promise<void>;
   saveGoal: (input: Omit<Goal, "id">, id?: string) => Promise<void>;
   deleteGoal: (id: string) => Promise<void>;
+  addToGoal: (id: string, amount: number) => Promise<void>;
+  saveMonthlyBudget: (amount: number) => Promise<void>;
   saveBudget: (category: string, amount: number) => Promise<void>;
   saveProfile: (input: {
     name: string;

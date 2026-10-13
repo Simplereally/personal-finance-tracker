@@ -101,6 +101,24 @@ try {
   });
   const goal = (await alice.query("goals"))[0];
   await assert.rejects(
+    () => bob.mutate("addToGoal", goal.id, 100),
+    /no longer available/,
+  );
+  for (const invalid of [0, -1, 1.5])
+    await assert.rejects(
+      () => alice.mutate("addToGoal", goal.id, invalid),
+      /positive amount/,
+    );
+  await Promise.all([
+    alice.mutate("addToGoal", goal.id, 100),
+    alice.mutate("addToGoal", goal.id, 200),
+  ]);
+  assert.equal((await alice.query("goals"))[0].saved, 20300);
+  await assert.rejects(
+    () => alice.mutate("addToGoal", goal.id, 99_999_999_999),
+    /positive amount/,
+  );
+  await assert.rejects(
     () => bob.mutate("deleteGoal", goal.id),
     /no longer available/,
   );
@@ -110,6 +128,16 @@ try {
     monthlyBudget: 250000,
   });
   assert.equal((await alice.query("me")).monthlyBudget, 250000);
+  await alice.mutate("saveMonthlyBudget", 260000);
+  const updatedProfile = await alice.query("me");
+  assert.equal(updatedProfile.monthlyBudget, 260000);
+  assert.equal(updatedProfile.name, "QA Alice");
+  assert.equal(updatedProfile.currency, "AUD");
+  assert.equal((await bob.query("me")).monthlyBudget, 0);
+  await assert.rejects(
+    () => alice.mutate("saveMonthlyBudget", -1),
+    /positive amount/,
+  );
   const secondBrowser = await browserSession();
   const wrong = await secondBrowser.mutate("signIn", {
     email,
@@ -159,7 +187,7 @@ try {
   });
   assert.match(blocked.error, /Too many attempts/);
   console.log(
-    "PASS: signup, sign-in, hashing, cookie reconnect, isolation, validation, CRUD, custom categories, budgets, goals, preferences, password rotation, session revocation, sign-out and login throttling.",
+    "PASS: signup, sign-in, hashing, cookie reconnect, isolation, validation, CRUD, custom categories, budgets, atomic savings additions, monthly limits, preferences, password rotation, session revocation, sign-out and login throttling.",
   );
   console.log(
     `Target: ${origin}. Test accounts use example.invalid; test financial rows were removed.`,

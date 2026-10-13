@@ -75,12 +75,11 @@ export function AuthPage() {
             className="max-w-md text-5xl leading-[1.04] tracking-[-0.04em] text-[#5d3449] sm:text-7xl"
             style={displayFont}
           >
-            A little room
-            <br />
-            to <em className="text-[#a3677f]">grow.</em>
+            Your money.
+            <br />A little <em className="text-[#a3677f]">clearer.</em>
           </p>
           <p className="mt-6 max-w-xs text-[15px] leading-7 text-[#856977]">
-            Your everyday spending. Your someday plans. A home for both.
+            Spending, limits and savings, in one place.
           </p>
           <div className="relative mt-10 hidden max-w-sm rotate-[-3deg] rounded-3xl border border-white/70 bg-[#fffaf5] p-6 shadow-[0_18px_45px_-25px_#8d6978] sm:block lg:mt-14">
             <div className="mb-5 flex items-center justify-between">
@@ -113,16 +112,11 @@ export function AuthPage() {
       <section className="flex items-center justify-center px-6 py-12 sm:px-12 lg:py-16">
         <div className="w-full max-w-sm">
           <h1
-            className="text-4xl tracking-[-0.03em] sm:text-5xl"
+            className="mb-8 text-4xl tracking-[-0.03em] sm:text-5xl"
             style={displayFont}
           >
-            {isSignUp ? "Make yourself at home." : "Welcome back."}
+            {isSignUp ? "Create your account." : "Welcome back."}
           </h1>
-          <p className="mt-3 mb-8 text-sm leading-6 text-[#87777e]">
-            {isSignUp
-              ? "A fresh start for you and your money."
-              : "Pick up where you left off."}
-          </p>
           <form
             className="space-y-5"
             onSubmit={(event) => void submit(event)}
@@ -151,11 +145,7 @@ export function AuthPage() {
             </Field>
             <Field
               label="Password"
-              hint={
-                isSignUp
-                  ? "At least 10 characters. Make it your own."
-                  : undefined
-              }
+              hint={isSignUp ? "Use at least 10 characters." : undefined}
             >
               <div className="relative">
                 <Input
@@ -196,7 +186,7 @@ export function AuthPage() {
             </Button>
           </form>
           <p className="mt-6 text-center text-sm text-[#87777e]">
-            {isSignUp ? "Already have an account?" : "New around here?"}{" "}
+            {isSignUp ? "Already have an account?" : "No account yet?"}{" "}
             <Link
               to={isSignUp ? "/login" : "/sign-up"}
               className="font-medium text-[#763f55] underline decoration-[#d7b5c3] underline-offset-4"
@@ -209,7 +199,7 @@ export function AuthPage() {
               to="/preview"
               className="inline-flex items-center gap-2 text-sm text-[#875e72] hover:text-[#6d354d]"
             >
-              Take a look around
+              Explore the preview
               <Icon name="right" size={14} />
             </Link>
           </div>

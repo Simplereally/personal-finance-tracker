@@ -15,6 +15,7 @@ export function GoalList({
   currency,
   onEdit,
   onAdd,
+  onContribute,
   compact = false,
   onViewAll,
 }: {
@@ -22,6 +23,7 @@ export function GoalList({
   currency: string;
   onEdit: (goal: Goal) => void;
   onAdd: () => void;
+  onContribute: (goal: Goal) => void;
   compact?: boolean;
   onViewAll?: () => void;
 }) {
@@ -32,8 +34,8 @@ export function GoalList({
     ) : goals.length === 0 ? (
       <Empty
         icon="goals"
-        title="Give your someday a name."
-        description="A holiday, a rainy-day fund, or something just for you."
+        title="What would you like to save for?"
+        description="Give it a target, then record money as you set it aside."
         action={
           <Button variant="secondary" onClick={onAdd}>
             <Icon name="plus" size={16} />
@@ -48,46 +50,67 @@ export function GoalList({
         }
       >
         {goals.slice(0, compact ? 2 : 20).map((goal, index) => {
-          const percent = Math.round((goal.saved / goal.target) * 100);
+          const percent = Math.round((goal.saved / goal.target) * 100),
+            complete = goal.saved >= goal.target;
           return (
-            <button
-              onClick={() => onEdit(goal)}
-              className={`w-full text-left focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#a3637b] ${compact ? "rounded-xl" : "rounded-2xl border border-[#e9e0db] bg-white p-6 transition-shadow hover:shadow-md"}`}
+            <div
+              key={goal.id}
+              className={
+                compact
+                  ? "rounded-xl"
+                  : "rounded-2xl border border-[#e9e0db] bg-white p-6"
+              }
             >
-              <div className="mb-3 flex items-center gap-3">
+              <div className="mb-4 flex items-center gap-3">
                 <span
-                  className={`flex size-10 shrink-0 items-center justify-center rounded-xl text-xl ${index % 2 ? "bg-[#e9eede]" : "bg-[#f6eadb]"}`}
+                  className={`flex size-11 shrink-0 items-center justify-center rounded-xl text-xl ${index % 2 ? "bg-[#e9eede]" : "bg-[#f6eadb]"}`}
                 >
                   {goal.emoji}
                 </span>
-                <span className="min-w-0 flex-1 truncate text-[12px] font-medium text-[#775b6a]">
-                  {goal.name}
-                </span>
-                <span className="text-[11px] text-[#826b77]">
-                  {percent >= 100 ? "✓" : `${percent}%`}
-                </span>
+                <button
+                  onClick={() => onEdit(goal)}
+                  className="min-w-0 flex-1 rounded-lg text-left hover:text-[#9b5674] focus-visible:outline-2 focus-visible:outline-[#a3637b]"
+                >
+                  <h3 className="truncate text-sm font-medium">{goal.name}</h3>
+                  <p className="mt-1 text-xs text-[#79656c]">
+                    {complete ? "Goal reached" : ""}
+                    {!complete &&
+                      `${money(Math.max(0, goal.target - goal.saved), currency, true)} to go`}
+                  </p>
+                </button>
+                <button
+                  aria-label={`Edit ${goal.name}`}
+                  onClick={() => onEdit(goal)}
+                  className="flex size-9 items-center justify-center rounded-full text-[#927080] hover:bg-[#f5ecec] focus-visible:outline-2 focus-visible:outline-[#a3637b]"
+                >
+                  <Icon name="edit" size={15} />
+                </button>
               </div>
               <Progress
                 label={goal.name}
                 value={percent}
-                color={index % 2 ? "#91a283" : "#c9a077"}
+                color={complete ? "#7b977a" : index % 2 ? "#91a283" : "#c3a17d"}
               />
-              <div className="mt-2.5 flex justify-between text-[10px]">
-                <span className="text-[#806775]">
-                  {money(goal.saved, currency, true)} saved
+              <div className="mt-2.5 flex flex-wrap justify-between gap-2 text-xs text-[#79656c]">
+                <span>
+                  <strong className="font-medium text-[#624653]">
+                    {money(goal.saved, currency, true)}
+                  </strong>{" "}
+                  / {money(goal.target, currency, true)}
                 </span>
-                <span className="text-[#826b77]">
-                  of {money(goal.target, currency, true)}
-                </span>
+                <span>{percent}%</span>
               </div>
-              {!compact && (
-                <p className="mt-5 text-xs text-[#9e8292]">
-                  {goal.saved >= goal.target
-                    ? "You made it. Time to celebrate!"
-                    : `${money(goal.target - goal.saved, currency, true)} to your someday`}
-                </p>
-              )}
-            </button>
+              <Button
+                aria-label={`Add money to ${goal.name}`}
+                variant={complete ? "ghost" : "secondary"}
+                size="sm"
+                className="mt-4 w-full"
+                onClick={() => onContribute(goal)}
+              >
+                <Icon name="plus" size={14} />
+                Add money
+              </Button>
+            </div>
           );
         })}
       </div>
@@ -95,12 +118,17 @@ export function GoalList({
   if (!compact)
     return (
       <>
-        <div className="mb-6 flex items-baseline gap-3">
-          <span className="text-4xl" style={displayFont}>
-            {money(total, currency)}
+        <div className="mb-7 flex flex-wrap items-baseline gap-3">
+          <span
+            className="min-w-0 max-w-full break-words text-[clamp(2rem,6vw,3rem)] tracking-[-0.04em]"
+            style={displayFont}
+          >
+            {goals === undefined ? "—" : money(total, currency)}
           </span>
-          <span className="text-sm text-[#826b77]">
-            saved across your goals
+          <span className="text-sm text-[#79656c]">
+            {goals === undefined
+              ? "Loading goals…"
+              : `recorded across ${goals.length} goals`}
           </span>
         </div>
         {contents}
@@ -109,25 +137,27 @@ export function GoalList({
   return (
     <Card className="bg-[#fffaf5]!">
       <CardHeader>
-        <CardTitle>Your someday plans</CardTitle>
+        <CardTitle>Savings goals</CardTitle>
         <button
           aria-label="Add savings goal"
           onClick={onAdd}
-          className="flex size-8 items-center justify-center rounded-full border border-[#e8dcd6] text-[#b18c9e] hover:bg-[#f4e7e9] focus-visible:outline-2 focus-visible:outline-[#a3637b]"
+          className="flex size-9 items-center justify-center rounded-full border border-[#e8dcd6] text-[#967080] hover:bg-[#f4e7e9] focus-visible:outline-2 focus-visible:outline-[#a3637b]"
         >
-          <Icon name="plus" size={14} />
+          <Icon name="plus" size={15} />
         </button>
       </CardHeader>
       <CardContent>
         {contents}
         {!!goals?.length && (
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={onViewAll}
-            className="mt-5 flex w-full items-center justify-center gap-1 text-[11px] text-[#826b77] hover:text-[#6d354d]"
+            className="mt-5 w-full"
           >
-            View all goals
+            All goals
             <Icon name="right" size={12} />
-          </button>
+          </Button>
         )}
       </CardContent>
     </Card>

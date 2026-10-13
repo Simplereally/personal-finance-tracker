@@ -34,6 +34,12 @@ const paths: Record<string, JSX.Element> = {
     </>
   ),
   plus: <path d="M12 5v14M5 12h14" />,
+  keyboard: (
+    <>
+      <rect x="2" y="5" width="20" height="14" rx="3" />
+      <path d="M6 9h.01M10 9h.01M14 9h.01M18 9h.01M6 12h.01M10 12h.01M14 12h.01M18 12h.01M7 15h10" />
+    </>
+  ),
   close: <path d="m6 6 12 12M6 18 18 6" />,
   left: <path d="m14 6-6 6 6 6" />,
   right: <path d="m10 6 6 6-6 6" />,

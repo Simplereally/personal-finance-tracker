@@ -4,6 +4,8 @@ import {
   cents,
   money,
   localDate,
+  dateLabel,
+  transactionShortcuts,
   type Transaction,
   type TransactionInput,
   type Goal,
@@ -11,6 +13,7 @@ import {
 } from "../../shared/finance";
 import { Button, Field, Input, Select, Spinner, inputClass } from "./ui";
 import { Icon } from "./icons";
+import { displayFont } from "../styles";
 
 export function FormError({ error }: { error: string }) {
   return error ? (
@@ -28,17 +31,35 @@ export function TransactionForm({
   onDelete,
   currency = "AUD",
   customCategories = [],
+  recentTransactions = [],
+  initial,
+  defaultDate = localDate(),
 }: {
   customCategories?: string[];
   currency?: string;
   transaction?: Transaction;
+  recentTransactions?: Transaction[];
+  initial?: Partial<TransactionInput>;
+  defaultDate?: string;
   onSave: (value: TransactionInput) => Promise<void>;
   onDelete?: () => Promise<void>;
 }) {
-  const [kind, setKind] = useState(transaction?.kind ?? "expense");
+  const [kind, setKind] = useState(
+    transaction?.kind ?? initial?.kind ?? "expense",
+  );
+  const [description, setDescription] = useState(
+    transaction?.description ?? initial?.description ?? "",
+  );
+  const [category, setCategory] = useState(
+    transaction?.category ??
+      initial?.category ??
+      (initial?.kind === "income" ? "Income" : "Food & coffee"),
+  );
+  const [date, setDate] = useState(transaction?.date ?? defaultDate);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const shortcuts = transactionShortcuts(recentTransactions);
   async function submit(event: SubmitEvent) {
     event.preventDefault();
     setError("");
@@ -48,10 +69,10 @@ export function TransactionForm({
       await onSave({
         kind,
         amount: cents(String(data.get("amount"))),
-        description: String(data.get("description")),
-        category: String(data.get("category")),
-        date: String(data.get("date")),
-        note: String(data.get("note")),
+        description,
+        category,
+        date,
+        note: String(data.get("note") ?? ""),
       });
     } catch (e) {
       setError(
@@ -71,10 +92,15 @@ export function TransactionForm({
       >
         {(["expense", "income"] as const).map((value) => (
           <button
+            key={value}
             type="button"
+            disabled={busy}
             aria-pressed={kind === value}
-            onClick={() => setKind(value)}
-            className={`flex min-h-10 items-center justify-center gap-2 rounded-lg text-sm font-medium focus-visible:outline-2 focus-visible:outline-[#a3637b] ${kind === value ? "bg-white text-[#743d54] shadow-sm" : "text-[#8a7a80]"}`}
+            onClick={() => {
+              setKind(value);
+              setCategory(value === "income" ? "Income" : "Food & coffee");
+            }}
+            className={`flex min-h-10 items-center justify-center gap-2 rounded-lg text-sm font-medium focus-visible:outline-2 focus-visible:outline-[#a3637b] ${kind === value ? "bg-white text-[#743d54] shadow-sm" : "text-[#79656c]"}`}
           >
             <Icon name={value} size={16} />
             {value === "expense" ? "Expense" : "Income"}
@@ -83,7 +109,10 @@ export function TransactionForm({
       </div>
       <Field label="Amount">
         <div className="relative">
-          <span className="pointer-events-none absolute left-4 top-3.5 text-[#9d7b89]">
+          <span
+            className="pointer-events-none absolute left-4 top-4 text-2xl text-[#9d7b89]"
+            style={displayFont}
+          >
             {money(0, currency).replace(/[0-9.,\s]/g, "")}
           </span>
           <Input
@@ -92,64 +121,107 @@ export function TransactionForm({
             placeholder="0.00"
             required
             autoFocus
-            className="pl-9 text-xl!"
+            disabled={busy}
+            className="min-h-[76px]! pl-10! text-[42px]! leading-none! tracking-[-0.03em]"
+            style={displayFont}
             defaultValue={
               transaction ? (transaction.amount / 100).toFixed(2) : ""
             }
           />
         </div>
       </Field>
+      {!transaction && shortcuts.length > 0 && (
+        <div
+          className="flex flex-wrap gap-2"
+          aria-label="Use a recent description"
+        >
+          {shortcuts.map((row) => (
+            <button
+              key={row.id}
+              type="button"
+              disabled={busy}
+              onClick={() => {
+                setDescription(row.description);
+                setCategory(row.category);
+                setKind(row.kind);
+              }}
+              className="max-w-full truncate rounded-full border border-[#e6d9dd] bg-[#fbf5f5] px-3 py-2 text-xs text-[#775565] hover:bg-[#f0e3e8] focus-visible:outline-2 focus-visible:outline-[#a3637b]"
+            >
+              {row.description}
+            </button>
+          ))}
+        </div>
+      )}
       <Field label="Description">
         <Input
           name="description"
           required
+          disabled={busy}
           maxLength={120}
           placeholder={
-            kind === "expense" ? "e.g. A little coffee break" : "e.g. Payday"
+            kind === "expense"
+              ? "Coffee, groceries, a night out…"
+              : "Salary, a gift, a refund…"
           }
-          defaultValue={transaction?.description}
+          value={description}
+          onInput={(event) => setDescription(event.currentTarget.value)}
         />
       </Field>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <Field label="Category">
-          <Select
-            name="category"
-            defaultValue={
-              transaction?.category ??
-              (kind === "income" ? "Income" : "Food & coffee")
-            }
-            key={kind}
-          >
-            {[...CATEGORIES.map((c) => c.name), ...customCategories].map(
-              (name) => (
-                <option value={name}>{name}</option>
-              ),
-            )}
-          </Select>
-        </Field>
-        <Field label="Date">
-          <Input
-            name="date"
-            type="date"
-            min="1900-01-01"
-            max="2200-12-31"
-            required
-            defaultValue={transaction?.date ?? localDate()}
-          />
-        </Field>
-      </div>
-      <Field label="Note (optional)">
-        <textarea
-          name="note"
-          rows={2}
-          maxLength={500}
-          placeholder="Anything you’d like to remember"
-          className={`${inputClass} resize-y`}
-          defaultValue={transaction?.note}
-        />
+      <Field label="Category">
+        <Select
+          name="category"
+          disabled={busy}
+          value={category}
+          onChange={(event) => setCategory(event.currentTarget.value)}
+        >
+          {[...CATEGORIES.map((c) => c.name), ...customCategories].map(
+            (name) => (
+              <option key={name} value={name}>
+                {name}
+              </option>
+            ),
+          )}
+        </Select>
       </Field>
+      <details
+        open={Boolean(transaction?.note)}
+        className="rounded-xl border border-[#e8e0dc] bg-[#fcf9f6] p-4"
+      >
+        <summary className="cursor-pointer text-xs font-medium text-[#79656c]">
+          {dateLabel(date)} · Date & note
+        </summary>
+        <div className="mt-4 space-y-4">
+          <Field label="Date">
+            <Input
+              name="date"
+              disabled={busy}
+              type="date"
+              min="1900-01-01"
+              max="2200-12-31"
+              required
+              value={date}
+              onChange={(event) => {
+                if (event.currentTarget.value)
+                  setDate(event.currentTarget.value);
+              }}
+            />
+          </Field>
+          <Field label="Note (optional)">
+            <textarea
+              aria-label="Note (optional)"
+              name="note"
+              disabled={busy}
+              rows={2}
+              maxLength={500}
+              placeholder="Anything to remember"
+              className={`${inputClass} resize-y`}
+              defaultValue={transaction?.note}
+            />
+          </Field>
+        </div>
+      </details>
       <FormError error={error} />
-      <div className="flex flex-wrap justify-between gap-3 pt-2">
+      <div className="flex flex-wrap justify-between gap-3 pt-1">
         {onDelete ? (
           <Button
             variant="ghost"
@@ -169,9 +241,9 @@ export function TransactionForm({
           ) : transaction ? (
             "Save changes"
           ) : (
-            "Add transaction"
+            "Save transaction"
           )}
-          <Icon name="arrow" size={17} />
+          <Icon name="check" size={16} />
         </Button>
       </div>
       {confirmDelete && (
@@ -320,15 +392,19 @@ export function GoalForm({
 }
 export function BudgetForm({
   category,
+  categories,
   amount,
+  currency = "AUD",
   onSave,
 }: {
   category: string;
+  categories?: string[];
   amount?: number;
-  onSave: (amount: number) => Promise<void>;
+  currency?: string;
+  onSave: (amount: number, category: string) => Promise<void>;
 }) {
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false),
+    [error, setError] = useState("");
   return (
     <form
       className="space-y-5"
@@ -336,9 +412,12 @@ export function BudgetForm({
         event.preventDefault();
         setBusy(true);
         setError("");
-        const data = new FormData(event.currentTarget as HTMLFormElement);
+        const data = new FormData(event.currentTarget);
         try {
-          await onSave(cents(String(data.get("amount")), true));
+          await onSave(
+            cents(String(data.get("amount")), true),
+            String(data.get("category") ?? category),
+          );
         } catch (e) {
           setError(
             e instanceof Error ? e.message : "Couldn’t save your budget.",
@@ -348,12 +427,24 @@ export function BudgetForm({
         }
       }}
     >
-      <p className="text-sm text-[#87777e]">
-        Your monthly limit for {category.toLowerCase()}.
-      </p>
+      {categories && (
+        <Field label="Category">
+          <Select name="category" defaultValue={category}>
+            {categories.map((name) => (
+              <option key={name} value={name}>
+                {name}
+              </option>
+            ))}
+          </Select>
+        </Field>
+      )}
       <Field
-        label="Monthly amount"
-        hint="Use 0 to remove this category’s budget."
+        label={`Monthly limit (${currency})`}
+        hint={
+          category === "Monthly spending"
+            ? "Applies each month. Use 0 to turn off your spending limit."
+            : "Use 0 to remove this category’s budget."
+        }
       >
         <Input
           name="amount"
@@ -366,7 +457,67 @@ export function BudgetForm({
       </Field>
       <FormError error={error} />
       <Button className="w-full" type="submit" disabled={busy}>
-        {busy ? <Spinner label="Saving" /> : "Save budget"}
+        {busy ? <Spinner label="Saving" /> : "Save limit"}
+      </Button>
+    </form>
+  );
+}
+export function GoalContributionForm({
+  goal,
+  currency,
+  onSave,
+}: {
+  goal: Goal;
+  currency: string;
+  onSave: (amount: number) => Promise<void>;
+}) {
+  const [busy, setBusy] = useState(false),
+    [error, setError] = useState("");
+  return (
+    <form
+      className="space-y-5"
+      onSubmit={async (event) => {
+        event.preventDefault();
+        setBusy(true);
+        setError("");
+        const data = new FormData(event.currentTarget);
+        try {
+          await onSave(cents(String(data.get("amount"))));
+        } catch (e) {
+          setError(
+            e instanceof Error ? e.message : "Couldn’t update your goal.",
+          );
+        } finally {
+          setBusy(false);
+        }
+      }}
+    >
+      <div className="flex items-center gap-3 rounded-xl bg-[#f3ece6] p-4">
+        <span className="text-2xl">{goal.emoji}</span>
+        <div>
+          <p className="text-sm font-medium">{goal.name}</p>
+          <p className="mt-1 text-xs text-[#79656c]">
+            {money(goal.saved, currency)} of {money(goal.target, currency)}
+          </p>
+        </div>
+      </div>
+      <Field label={`Amount to add (${currency})`}>
+        <Input
+          name="amount"
+          inputMode="decimal"
+          autoFocus
+          required
+          placeholder="0.00"
+        />
+      </Field>
+      <p className="text-xs leading-5 text-[#79656c]">
+        Record money you’ve already set aside. This updates your goal; it
+        doesn’t move money or create a transaction.
+      </p>
+      <FormError error={error} />
+      <Button type="submit" disabled={busy} className="w-full">
+        {busy ? <Spinner label="Saving" /> : "Add to savings"}
+        <Icon name="plus" size={16} />
       </Button>
     </form>
   );

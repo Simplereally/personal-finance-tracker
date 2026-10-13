@@ -2,6 +2,9 @@ import { useEffect, useState } from "preact/hooks";
 import { Link, useLocation, useNavigate } from "lakebed/client";
 import {
   moveMonth,
+  localDate,
+  CATEGORIES,
+  type TransactionInput,
   type Profile,
   type Summary,
   type Transaction,
@@ -13,8 +16,19 @@ import type { Actions } from "../types";
 import { Brand } from "./auth";
 import { Icon } from "./icons";
 import { Button, Card, CardHeader, CardTitle, CardContent, Dialog } from "./ui";
-import { TransactionForm, GoalForm, BudgetForm, ProfileForm } from "./forms";
-import { Stats, SpendingChart, SpendingCategories } from "./dashboard";
+import {
+  TransactionForm,
+  GoalForm,
+  BudgetForm,
+  ProfileForm,
+  GoalContributionForm,
+} from "./forms";
+import {
+  MonthOverview,
+  BudgetAttention,
+  SpendingChart,
+  SpendingCategories,
+} from "./dashboard";
 import { TransactionList } from "./transactions";
 import { GoalList } from "./goals";
 import { BudgetList } from "./budgets";
@@ -27,9 +41,16 @@ const navItems = [
   { path: "/settings", label: "Settings", icon: "settings" },
 ];
 type Modal =
-  | { kind: "transaction"; value?: Transaction }
+  | {
+      kind: "transaction";
+      value?: Transaction;
+      initial?: Partial<TransactionInput>;
+    }
   | { kind: "goal"; value?: Goal }
-  | { kind: "budget"; category: string; amount?: number }
+  | { kind: "budget"; category: string; amount?: number; choose?: boolean }
+  | { kind: "monthlyBudget" }
+  | { kind: "contribute"; goal: Goal }
+  | { kind: "shortcuts" }
   | null;
 
 export function Workspace({
@@ -64,6 +85,7 @@ export function Workspace({
     navItems.find((item) => item.path === activePath) ?? navItems[0];
   const [modal, setModal] = useState<Modal>(null);
   const [toast, setToast] = useState("");
+  const [filterCategory, setFilterCategory] = useState("all");
   const [logoutBusy, setLogoutBusy] = useState(false);
   useEffect(() => {
     if (!toast) return;
@@ -77,6 +99,8 @@ export function Workspace({
         event.key === "n" &&
         !event.metaKey &&
         !event.ctrlKey &&
+        !event.altKey &&
+        !event.repeat &&
         !["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName) &&
         !target.isContentEditable &&
         !modal
@@ -85,10 +109,39 @@ export function Workspace({
         setModal({ kind: "transaction" });
       }
     };
+    const extraHandler = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement;
+      if (
+        modal ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.altKey ||
+        ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName) ||
+        target.isContentEditable
+      )
+        return;
+      if (event.key === "?") {
+        event.preventDefault();
+        setModal({ kind: "shortcuts" });
+      }
+      if (event.key === "/" && activePath === "/transactions") {
+        event.preventDefault();
+        document
+          .querySelector<HTMLInputElement>(
+            'input[aria-label="Search transactions"]',
+          )
+          ?.focus();
+      }
+    };
+    window.addEventListener("keydown", extraHandler);
     window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, [modal]);
+    return () => {
+      window.removeEventListener("keydown", handler);
+      window.removeEventListener("keydown", extraHandler);
+    };
+  }, [modal, activePath]);
   useEffect(() => {
+    window.scrollTo(0, 0);
     if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       document.getElementById("main")?.animate?.(
         [
@@ -105,17 +158,29 @@ export function Workspace({
   };
   const pathTo = (path: string) =>
     preview ? "/preview" + (path === "/" ? "" : path) : path;
-  const greeting =
-    new Date().getHours() < 12
-      ? "Good morning"
-      : new Date().getHours() < 18
-        ? "Good afternoon"
-        : "Good evening";
   const monthLabel = new Intl.DateTimeFormat("en-AU", {
     month: "long",
     year: "numeric",
   }).format(new Date(month + "-01T12:00:00"));
   const isOverview = active.path === "/";
+  const emptyMonth = transactions !== undefined && transactions.length === 0;
+  const unusedCategories = [
+    ...CATEGORIES.map((c) => c.name),
+    ...customCategories.map((c) => c.name),
+  ].filter(
+    (name) => name !== "Income" && !budgets?.some((b) => b.category === name),
+  );
+  const addBudget = () =>
+    setModal(
+      unusedCategories.length
+        ? { kind: "budget", category: unusedCategories[0], choose: true }
+        : { kind: "monthlyBudget" },
+    );
+  const reviewCategory = (category: string) => {
+    setFilterCategory(category);
+    navigate(pathTo("/transactions"));
+  };
+  const contribute = (goal: Goal) => setModal({ kind: "contribute", goal });
   return (
     <div className="min-h-dvh lg:pl-[240px]">
       <a
@@ -150,7 +215,7 @@ export function Workspace({
               <span className="block truncate text-sm font-medium">
                 {profile.name}
               </span>
-              <span className="block text-[11px] text-[#9a8790]">
+              <span className="block truncate text-[11px] text-[#79656c]">
                 {profile.email}
               </span>
             </span>
@@ -166,13 +231,15 @@ export function Workspace({
           {active.label}
         </span>
         <div className="flex items-center gap-3">
-          <span className="hidden rounded-full border border-[#e8dfd9] px-3 py-1.5 text-xs text-[#917c87] sm:inline-flex">
-            {new Intl.DateTimeFormat("en-AU", {
-              weekday: "short",
-              day: "numeric",
-              month: "short",
-            }).format(new Date())}
-          </span>
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Keyboard shortcuts"
+            className="hidden! lg:inline-flex!"
+            onClick={() => setModal({ kind: "shortcuts" })}
+          >
+            <Icon name="keyboard" size={19} />
+          </Button>
           <button
             onClick={() => navigate(pathTo("/settings"))}
             aria-label="Open account settings"
@@ -184,9 +251,7 @@ export function Workspace({
       </header>
       {preview && (
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#e6d6df] bg-[#f3e7ed] px-5 py-2.5 text-xs text-[#805669] sm:px-9">
-          <span>
-            You’re exploring a preview. Changes stay here until you leave.
-          </span>
+          <span>Preview · Fictional data, changes aren’t saved.</span>
           <Link
             to="/sign-up"
             className="inline-flex items-center gap-1 font-semibold underline underline-offset-4"
@@ -206,34 +271,18 @@ export function Workspace({
               className="text-[38px] leading-[1.12] tracking-[-0.035em] sm:text-[45px]"
               style={displayFont}
             >
-              {isOverview ? (
-                <>
-                  {greeting}, {profile.name.split(" ")[0]}
-                  <span className="ml-2 inline-block text-[#b27b8e]">✳</span>
-                </>
-              ) : active.path === "/goals" ? (
-                "Your someday plans."
-              ) : active.path === "/budgets" ? (
-                "A plan that fits you."
-              ) : active.path === "/settings" ? (
-                "Make it yours."
-              ) : (
-                "The little things add up."
-              )}
-            </h1>
-            <p className="mt-2.5 text-sm text-[#826b77]">
               {isOverview
-                ? "Here’s how your month is shaping up."
-                : active.path === "/transactions"
-                  ? "Every coffee, payday, and everything in between."
+                ? `Your month, ${profile.name.split(" ")[0]}.`
+                : active.path === "/goals"
+                  ? "Savings goals."
                   : active.path === "/budgets"
-                    ? "Spend with a little more intention."
-                    : active.path === "/goals"
-                      ? "Something to look forward to. Something to grow."
-                      : "A few details to feel right at home."}
-            </p>
+                    ? "Your spending plan."
+                    : active.path === "/settings"
+                      ? "Settings."
+                      : "Transactions."}
+            </h1>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             {!["/goals", "/settings"].includes(active.path) && (
               <div className="flex h-11 items-center rounded-xl border border-[#e7dfd9] bg-white">
                 <button
@@ -269,7 +318,17 @@ export function Workspace({
                 </button>
               </div>
             )}
-            {active.path !== "/settings" && (
+            {!["/goals", "/settings"].includes(active.path) &&
+              month !== localDate().slice(0, 7) && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setMonth(localDate().slice(0, 7))}
+                >
+                  This month
+                </Button>
+              )}
+            {!["/settings", "/budgets"].includes(active.path) && (
               <Button
                 onClick={() =>
                   setModal(
@@ -289,20 +348,82 @@ export function Workspace({
             )}
           </div>
         </div>
-        {(isOverview || active.path === "/transactions") && (
-          <Stats summary={summary} profile={profile} />
-        )}
         {isOverview && (
+          <>
+            <MonthOverview
+              summary={summary}
+              profile={profile}
+              month={month}
+              onEditBudget={() => setModal({ kind: "monthlyBudget" })}
+            />
+            <BudgetAttention
+              budgets={budgets ?? []}
+              summary={summary}
+              currency={profile.currency}
+              onReview={reviewCategory}
+            />
+          </>
+        )}
+        {isOverview && emptyMonth && (
+          <Card className="mt-6">
+            <CardContent className="pt-8 sm:p-8">
+              <h2 className="text-3xl" style={displayFont}>
+                Nothing recorded in {monthLabel} yet.
+              </h2>
+              <p className="mt-3 mb-6 max-w-xl text-sm leading-6 text-[#79656c]">
+                Start with a payday or a purchase. Your overview takes shape as
+                you add them.
+              </p>
+              <div className="flex flex-wrap gap-3">
+                <Button
+                  onClick={() =>
+                    setModal({
+                      kind: "transaction",
+                      initial: { kind: "income" },
+                    })
+                  }
+                >
+                  <Icon name="income" size={16} />
+                  Record income
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setModal({ kind: "transaction" })}
+                >
+                  <Icon name="expense" size={16} />
+                  Record an expense
+                </Button>
+                {!goals?.length && (
+                  <Button
+                    variant="ghost"
+                    onClick={() => setModal({ kind: "goal" })}
+                  >
+                    <Icon name="goals" size={16} />
+                    Create a savings goal
+                  </Button>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+        {isOverview && !emptyMonth && (
           <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-[1.5fr_1fr]">
             <SpendingChart
               summary={summary}
               currency={profile.currency}
+              key={month}
               month={month}
+              limit={profile.monthlyBudget}
+              onAdd={() => setModal({ kind: "transaction" })}
             />
-            <SpendingCategories summary={summary} currency={profile.currency} />
+            <SpendingCategories
+              summary={summary}
+              currency={profile.currency}
+              onCategory={reviewCategory}
+            />
           </div>
         )}
-        {isOverview && (
+        {isOverview && !emptyMonth && (
           <div className="mt-6 grid grid-cols-1 items-start gap-6 xl:grid-cols-[1.5fr_1fr]">
             <TransactionList
               customCategories={customCategories.map((c) => c.name)}
@@ -318,6 +439,20 @@ export function Workspace({
               currency={profile.currency}
               onEdit={(value) => setModal({ kind: "goal", value })}
               onAdd={() => setModal({ kind: "goal" })}
+              onContribute={contribute}
+              compact
+              onViewAll={() => navigate(pathTo("/goals"))}
+            />
+          </div>
+        )}
+        {isOverview && emptyMonth && !!goals?.length && (
+          <div className="mt-6 max-w-xl">
+            <GoalList
+              goals={goals}
+              currency={profile.currency}
+              onEdit={(value) => setModal({ kind: "goal", value })}
+              onAdd={() => setModal({ kind: "goal" })}
+              onContribute={contribute}
               compact
               onViewAll={() => navigate(pathTo("/goals"))}
             />
@@ -326,6 +461,8 @@ export function Workspace({
         {active.path === "/transactions" && (
           <div className="mt-6">
             <TransactionList
+              key={filterCategory}
+              initialCategory={filterCategory}
               customCategories={customCategories.map((c) => c.name)}
               transactions={transactions}
               currency={profile.currency}
@@ -336,14 +473,16 @@ export function Workspace({
         )}
         {active.path === "/budgets" && (
           <BudgetList
-            customCategories={customCategories.map((c) => c.name)}
             profile={profile}
             summary={summary}
-            budgets={budgets ?? []}
+            budgets={budgets}
             onEdit={(category, amount) =>
               setModal({ kind: "budget", category, amount })
             }
-            onSetOverall={() => navigate(pathTo("/settings"))}
+            onSetOverall={() => setModal({ kind: "monthlyBudget" })}
+            onAdd={addBudget}
+            canAdd={unusedCategories.length > 0}
+            onReview={reviewCategory}
           />
         )}
         {active.path === "/goals" && (
@@ -352,6 +491,7 @@ export function Workspace({
             currency={profile.currency}
             onEdit={(value) => setModal({ kind: "goal", value })}
             onAdd={() => setModal({ kind: "goal" })}
+            onContribute={contribute}
           />
         )}
         {active.path === "/settings" && (
@@ -382,7 +522,7 @@ export function Workspace({
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium">
-                      All done for now?
+                      Signed in as {profile.name}
                     </span>
                     <Button
                       variant="outline"
@@ -425,13 +565,18 @@ export function Workspace({
       </nav>
       {modal?.kind === "transaction" && (
         <Dialog
-          title={modal.value ? "A little edit." : "Add a transaction."}
+          title={modal.value ? "Edit transaction" : "New transaction"}
           onClose={() => setModal(null)}
         >
           <TransactionForm
             customCategories={customCategories.map((c) => c.name)}
             currency={profile.currency}
             transaction={modal.value}
+            initial={modal.initial}
+            recentTransactions={transactions ?? []}
+            defaultDate={
+              month === localDate().slice(0, 7) ? localDate() : month + "-01"
+            }
             onSave={async (input) => {
               await actions.saveTransaction(input, modal.value?.id);
               setMonth(input.date.slice(0, 7));
@@ -439,8 +584,8 @@ export function Workspace({
                 modal.value
                   ? "Transaction updated."
                   : input.kind === "income"
-                    ? "A little more room to grow. Income added."
-                    : "All noted. Transaction added.",
+                    ? "Income added."
+                    : "Transaction added.",
               );
             }}
             onDelete={
@@ -456,7 +601,7 @@ export function Workspace({
       )}
       {modal?.kind === "goal" && (
         <Dialog
-          title={modal.value ? "A little closer." : "What’s your someday?"}
+          title={modal.value ? "Edit savings goal" : "New savings goal"}
           onClose={() => setModal(null)}
         >
           <GoalForm
@@ -466,7 +611,7 @@ export function Workspace({
               success(
                 input.saved >= input.target
                   ? "You made it! Your goal is fully saved. ✨"
-                  : "One step closer. Goal saved.",
+                  : "Goal saved.",
               );
             }}
             onDelete={
@@ -481,19 +626,74 @@ export function Workspace({
         </Dialog>
       )}
       {modal?.kind === "budget" && (
-        <Dialog title={modal.category} onClose={() => setModal(null)}>
+        <Dialog
+          title={modal.choose ? "New category limit" : modal.category}
+          onClose={() => setModal(null)}
+        >
           <BudgetForm
             category={modal.category}
             amount={modal.amount}
+            currency={profile.currency}
+            categories={modal.choose ? unusedCategories : undefined}
+            onSave={async (amount, category) => {
+              await actions.saveBudget(category, amount);
+              success(amount ? "Budget saved." : "Budget removed.");
+            }}
+          />
+        </Dialog>
+      )}
+      {modal?.kind === "monthlyBudget" && (
+        <Dialog
+          title="Your monthly spending limit"
+          onClose={() => setModal(null)}
+        >
+          <BudgetForm
+            category="Monthly spending"
+            amount={profile.monthlyBudget}
+            currency={profile.currency}
             onSave={async (amount) => {
-              await actions.saveBudget(modal.category, amount);
+              await actions.saveMonthlyBudget(amount);
               success(
-                amount
-                  ? "A little intention. Budget saved."
-                  : "Budget removed.",
+                amount ? "Monthly limit saved." : "Monthly limit removed.",
               );
             }}
           />
+        </Dialog>
+      )}
+      {modal?.kind === "contribute" && (
+        <Dialog title="Add to your savings" onClose={() => setModal(null)}>
+          <GoalContributionForm
+            goal={modal.goal}
+            currency={profile.currency}
+            onSave={async (amount) => {
+              await actions.addToGoal(modal.goal.id, amount);
+              success("Savings updated.");
+            }}
+          />
+        </Dialog>
+      )}
+      {modal?.kind === "shortcuts" && (
+        <Dialog title="A few shortcuts" onClose={() => setModal(null)}>
+          <dl className="space-y-4 text-sm">
+            {[
+              ["N", "Record a transaction"],
+              ["/", "Search on the transactions page"],
+              ["Esc", "Close a dialog"],
+              ["?", "Show keyboard shortcuts"],
+            ].map(([key, label]) => (
+              <div
+                key={key}
+                className="flex items-center justify-between gap-4"
+              >
+                <dt>{label}</dt>
+                <dd>
+                  <kbd className="rounded-lg border border-[#dfd2d7] bg-[#f5eeeb] px-3 py-1.5 font-mono text-xs">
+                    {key}
+                  </kbd>
+                </dd>
+              </div>
+            ))}
+          </dl>
         </Dialog>
       )}
       {toast && (

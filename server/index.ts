@@ -452,6 +452,22 @@ export default capsule({
         }
       },
     ),
+    addToGoal: mutation(
+      async (ctx: WriteContext, rowId: string, amount: number) => {
+        validateAmount(amount);
+        await owned(ctx, "goals", rowId);
+        const goal = await ctx.db.goals.get(rowId);
+        if (!goal) throw new Error("This goal is no longer available.");
+        const saved = goal.saved + amount;
+        validateAmount(saved, true);
+        await ctx.db.goals.update(rowId, { saved });
+      },
+    ),
+    saveMonthlyBudget: mutation(async (ctx: WriteContext, amount: number) => {
+      const account = await accountFor(ctx);
+      validateAmount(amount, true);
+      await ctx.db.accounts.update(account.id, { monthlyBudget: amount });
+    }),
     deleteGoal: mutation(async (ctx: WriteContext, rowId: string) => {
       await owned(ctx, "goals", rowId);
       await ctx.db.goals.delete(rowId);

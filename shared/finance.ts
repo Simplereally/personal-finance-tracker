@@ -205,6 +205,55 @@ export function moveMonth(month: string, delta: number): string {
   const date = new Date(year, number - 1 + delta, 1);
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
 }
+export function monthPosition(month: string, today = localDate()) {
+  validateMonth(month);
+  validateDate(today);
+  const [year, number] = month.split("-").map(Number);
+  const days = new Date(year, number, 0).getDate();
+  const current = today.slice(0, 7);
+  const state =
+    month === current ? "current" : month < current ? "past" : "future";
+  const elapsed =
+    state === "past" ? days : state === "future" ? 0 : Number(today.slice(8));
+  return {
+    days,
+    elapsed,
+    remaining:
+      state === "current" ? days - elapsed + 1 : state === "future" ? days : 0,
+    state,
+  };
+}
+export type TransactionFilters = {
+  search: string;
+  kind: string;
+  category: string;
+};
+export function filterTransactions(
+  rows: Transaction[],
+  filters: TransactionFilters,
+) {
+  const search = filters.search.trim().toLowerCase();
+  return rows.filter(
+    (row) =>
+      (filters.kind === "all" || row.kind === filters.kind) &&
+      (filters.category === "all" || row.category === filters.category) &&
+      `${row.description} ${row.note} ${row.category}`
+        .toLowerCase()
+        .includes(search),
+  );
+}
+export function transactionShortcuts(rows: Transaction[]) {
+  const seen = new Set<string>();
+  return [...rows]
+    .sort((a, b) => b.date.localeCompare(a.date))
+    .filter((row) => {
+      const key = `${row.kind}:${row.description.toLowerCase()}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .slice(0, 4);
+}
 export function csv(transactions: Transaction[], currency: string): string {
   const escape = (value: string) =>
     `"${(/^[=+@\-\t\r]/.test(value) ? "'" : "") + value.replaceAll('"', '""')}"`;

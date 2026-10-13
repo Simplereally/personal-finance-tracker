@@ -7,15 +7,17 @@ A personal finance tracker with a warm ivory, rose, and plum interface. Built as
 ## What it does
 
 - Email/password account creation and sign-in, with private account data across browsers.
-- Monthly income, spending, and net balance; daily expense chart and category breakdown.
+- A focused monthly overview: remaining spending limit, income and expenses, and a daily allowance calculated from recorded spending and days remaining. Without a limit, it shows income after expenses.
+- An interactive cumulative spending chart with pointer and keyboard day exploration; category breakdowns open filtered transactions directly.
 - Add, edit, and delete transactions, with exact integer-cent amounts and validated dates.
-- Search by description, category, or note; filter by type/category; export the selected month and filters to CSV.
-- Monthly overall and category spending budgets.
-- Savings goals with editable targets and progress.
+- Transactions grouped by day, recent-entry shortcuts, and optional date/note details tucked away until needed.
+- Search by description, category, or note; filter by type/category; see matching totals and export that same dataset to CSV.
+- Monthly overall limits edited in place, category limits shown only when configured, and actionable warnings for categories approaching or exceeding their limit.
+- Savings goals with editable targets and progress, plus a focused Add money action that atomically records contributions without moving funds.
 - Personal categories, including safe removal that preserves transaction history.
 - Name, currency, monthly budget, and password settings.
 - Phone navigation, native date/month pickers, keyboard-accessible dialogs, reduced-motion support, and useful empty states.
-- Press **N** outside a form to add a transaction; **Escape** closes a dialog.
+- Press **N** outside a form to add a transaction, **/** to search on the transactions page, **?** to see shortcuts, and **Escape** to close a dialog.
 
 The preview is isolated, uses fictional data, and keeps changes in memory. Newly created accounts start empty.
 
@@ -39,7 +41,7 @@ npm outdated
 npm audit
 ```
 
-`check` runs TypeScript, Oxlint, unit tests, and the Lakebed artifact build. The integration suite uses protected browser cookies and the actual WebSocket API to verify auth, money validation, account isolation, CRUD, custom categories, budgets, goals, password rotation, session revocation, and throttling. It creates synthetic accounts under `example.invalid` and removes its financial test rows.
+`check` runs TypeScript, Oxlint, unit tests, and the Lakebed artifact build. The integration suite uses protected browser cookies and the actual WebSocket API to verify auth, money validation, account isolation, CRUD, custom categories, budgets, concurrent savings contributions, focused monthly-limit updates, password rotation, session revocation, and throttling. It creates synthetic accounts under `example.invalid` and removes its financial test rows.
 
 To test an explicitly chosen hosted deployment:
 

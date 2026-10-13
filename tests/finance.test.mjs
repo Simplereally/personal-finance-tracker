@@ -9,6 +9,9 @@ import {
   csv,
   normalizeEmail,
   moveMonth,
+  monthPosition,
+  filterTransactions,
+  transactionShortcuts,
 } from "../shared/finance.ts";
 import {
   hashPassword,
@@ -31,6 +34,87 @@ test("money uses exact cents and rejects ambiguous or fractional-cent input", ()
     "1.2.3",
   ])
     assert.throws(() => cents(value));
+});
+test("month context handles current, completed, future and leap-year months", () => {
+  assert.deepEqual(monthPosition("2026-10", "2026-10-13"), {
+    days: 31,
+    elapsed: 13,
+    remaining: 19,
+    state: "current",
+  });
+  assert.deepEqual(monthPosition("2024-02", "2024-02-29"), {
+    days: 29,
+    elapsed: 29,
+    remaining: 1,
+    state: "current",
+  });
+  assert.equal(monthPosition("2026-09", "2026-10-13").remaining, 0);
+  assert.equal(monthPosition("2026-11", "2026-10-13").elapsed, 0);
+  assert.throws(() => monthPosition("2026-13", "2026-10-13"));
+});
+test("transaction drill-down and search use the same complete filtered dataset", () => {
+  const row = {
+    id: "1",
+    description: "Coffee",
+    category: "Food & coffee",
+    note: "With mum",
+    date: "2026-10-13",
+    kind: "expense",
+    amount: 650,
+  };
+  const rows = [
+    row,
+    {
+      ...row,
+      id: "2",
+      kind: "income",
+      category: "Income",
+      description: "Payday",
+    },
+    { ...row, id: "3", category: "Shopping", description: "Flowers", note: "" },
+  ];
+  assert.deepEqual(
+    filterTransactions(rows, {
+      kind: "expense",
+      category: "Food & coffee",
+      search: " MUM ",
+    }),
+    [row],
+  );
+  assert.equal(
+    filterTransactions(rows, { kind: "all", category: "all", search: "" })
+      .length,
+    3,
+  );
+  assert.equal(
+    filterTransactions(rows, {
+      kind: "income",
+      category: "Food & coffee",
+      search: "",
+    }).length,
+    0,
+  );
+});
+test("recent shortcuts are unique by description and direction, newest first", () => {
+  const row = {
+    id: "1",
+    description: "Coffee",
+    category: "Food & coffee",
+    note: "",
+    date: "2026-10-01",
+    kind: "expense",
+    amount: 650,
+  };
+  const rows = [
+    row,
+    { ...row, id: "2", description: "COFFEE", date: "2026-10-13" },
+    { ...row, id: "3", kind: "income", date: "2026-10-12" },
+  ];
+  assert.deepEqual(
+    transactionShortcuts(rows).map((r) => r.id),
+    ["2", "3"],
+  );
+  assert.equal(rows[0].id, "1");
 });
 test("calendar validation catches rollover dates, leap years and invalid months", () => {
   assert.equal(validateDate("2024-02-29"), "2024-02-29");

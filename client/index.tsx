@@ -24,7 +24,7 @@ import { Workspace } from "./components/workspace";
 import { Button } from "./components/ui";
 export function App() {
   useEffect(() => {
-    document.title = "Petal — a little room to grow";
+    document.title = "Petal — your money, clearly";
     const link = document.createElement("link");
     link.rel = "stylesheet";
     link.href =
@@ -109,6 +109,8 @@ function ConnectedWorkspace({ profile }: { profile: Profile }) {
     deleteTransaction: client.useMutation("deleteTransaction"),
     saveGoal: client.useMutation("saveGoal"),
     deleteGoal: client.useMutation("deleteGoal"),
+    addToGoal: client.useMutation("addToGoal"),
+    saveMonthlyBudget: client.useMutation("saveMonthlyBudget"),
     saveBudget: client.useMutation("saveBudget"),
     saveProfile: client.useMutation("saveProfile"),
     changePassword: client.useMutation("changePassword"),
